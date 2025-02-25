@@ -22,16 +22,18 @@ def taboo_start(
     ingame_id: str = Query(default="null-id", description="Specify the in game: gameState.aiEscapeRoomID"),
     level: Optional[int] = Query(default=1, ge=1, le=3, description="Specify the level of the game (1 to 3)"),
     user_id: Optional[int] = Query(default=0, description="Specify the user ID (default is 0)"),
-    username: Optional[str] = Query(default="anonymous", description="Specify the username"),  # Added 'username' parameter
-    db: Session = Depends(get_db)  # Added 'db' parameter for database session
+    username: Optional[str] = Query(default="anonymous", description="Specify the username"),
+    model_name: Optional[str] = Query(default="claude-3-5-sonnet-20240620", description="Specify the AI model to use"),
+    db: Session = Depends(get_db)
 ):
     session_id = str(uuid.uuid4())
     difficulty = extract_difficulty(ingame_id)
-    game = TabooGame(difficulty=difficulty, game_level=level)
-    # games[session_id] = game  # Commented out; no longer using 'games' dict
-
+    
+    # Use the provided model_name parameter instead of hardcoding it
+    game = TabooGame(difficulty=difficulty, game_level=level, model_name=model_name)
+    
     ensure_user_exists(user_id=user_id, username=username, db=db)
-
+    
     # Create a new GameSession in the database
     new_session = GameSession(
         session_id=session_id,
@@ -40,17 +42,17 @@ def taboo_start(
         game_name="Taboo",
         state=GameState.PLAYING,
         target_phrase=game.game_secret,
-        model=game.model_name,
+        model=model_name,  # Use the model_name parameter here
         history=game.conversation.messages,
         round=game.round,
         game_over=game.game_over,
         game_status=game.game_status,
         level=level,
         system_prompt=game.system_prompt
-    )  # Added code to create a new GameSession
-    db.add(new_session)  # Add the session to the database
-    db.commit()  # Commit the transaction
-
+    )
+    db.add(new_session)
+    db.commit()
+    
     return {
         "message": "Taboo game started.",
         "session_id": session_id,

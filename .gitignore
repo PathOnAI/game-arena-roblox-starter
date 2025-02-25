@@ -1,3 +1,4 @@
+__pycache__/
 ai-space-escape-engine-main/web_server.log*
 ai-space-escape-engine-main/src/config/*
 venv
