@@ -25,5 +25,19 @@ curl -X POST \
 
 ```
 
-3. use ai npc sdk
-https://bejewled-line-62a.notion.site/Create-AI-NPCs-with-DeterminantAI-a7be1c43a8114c44ba6df421f2656592
+3. deploy to vercel
+
+4. use ai npc sdk for chat
+https://www.roblox.com/games/82289819259183/SimpleChatGame
+
+
+5. use ai npc sdk for action
+change the character name
+https://www.roblox.com/games/79072648104484/SimpleActionGame
+
+6. add other components to the game
+terrain, apple, desk, chair, etc.
+https://www.roblox.com/games/110910600686487/SimpleActionGame2#!/game-instances
+
+7. use ai npc sdk to recreate the ai space escape game
+
