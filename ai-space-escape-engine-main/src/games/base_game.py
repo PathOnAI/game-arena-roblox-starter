@@ -189,7 +189,7 @@ class BaseGame(ABC):
             max_new_tokens=max_new_tokens,
             state=state,
         )
-        import pdb; pdb.set_trace()
+        
         output = ""
         for data in stream_iter:
             assert data["error_code"] == 0

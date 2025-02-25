@@ -79,13 +79,32 @@ article{hu2024gamearena,
 curl http://0.0.0.0:8500/
 {"message":"Welcome to the Game Arena!"}% 
 
-curl -X POST http://0.0.0.0:8500/taboo/start   
+curl -X POST "http://0.0.0.0:8500/taboo/start?model_name=claude-3-5-sonnet-20240620"
+
 {"message":"Taboo game started.","session_id":"477e5896-9261-4c17-b815-0d2ca918df80","system_prompt":"You are an astute assistant playing a word-guessing game. The user will have a secret word in mind, and your objective is to guess it. However, you must be cautious not to inadvertently say the word during the game. Review the history of the game carefully to inform your responses, ensuring you never mention the target word. Keep your answers logical and aligned with the game’s rules. The user’s questions won’t explicitly include the target word. The rules are as follows:\n\n1. Respond to Questions: Each turn, the user will ask a question. Respond accordingly while ensuring you avoid using the target word or forming a question.\n\n2. Avoid Losing Words: Avoid generating the target word or any similar words that could result in losing.\n\n3. Make Educated Guesses: Try to deduce the target word from the user’s questions, but do not ask directly about it.\n\n4. Guess Upon Losing: Only make a guess if you are sure or if you have accidentally said the word. Use this format: 'My guess of the word is: ...'.\n\n5. Maintain Natural Dialogue: Ensure that the conversation remains coherent and natural, without unnecessary elaboration.\n\n6. Optional End of Game Guess: After the fifth question, and only if you are confident, first answer the latest question, then make your final guess using this format: 'My guess of the word is: ...'.\n\n7. Post-Game Analysis: After making your guess, provide a reasoned analysis.\n\n8. Keep your response as concise as possible.\n\nThe game session starts now. Let's proceed:","game_secret":"Dolphin","game_hint":null}% 
 
 curl -X POST \
   -H "Content-Type: application/json" \
   -d '{"user_response": "Is it something you can find in a house?"}' \
-  "http://0.0.0.0:8500/taboo/ask_question?session_id=1586c73a-8ce4-45a2-bd4a-b8856f40db95"
+  "http://0.0.0.0:8500/taboo/ask_question?session_id=ab5e6153-b5b6-431d-ba2f-65bd1fa75ef3"
+
+
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"user_response": "Is it an animal?"}' \
+  "http://0.0.0.0:8500/taboo/ask_question?session_id=ab5e6153-b5b6-431d-ba2f-65bd1fa75ef3"
+
+
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"user_response": "Is it an eagle?"}' \
+  "http://0.0.0.0:8500/taboo/ask_question?session_id=ab5e6153-b5b6-431d-ba2f-65bd1fa75ef3"
+
+
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"user_response": "Is it a desk?"}' \
+  "http://0.0.0.0:8500/taboo/ask_question?session_id=ab5e6153-b5b6-431d-ba2f-65bd1fa75ef3"
 ```
 
 
