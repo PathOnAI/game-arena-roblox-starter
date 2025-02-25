@@ -86,25 +86,25 @@ curl -X POST "http://0.0.0.0:8500/taboo/start?model_name=claude-3-5-sonnet-20240
 curl -X POST \
   -H "Content-Type: application/json" \
   -d '{"user_response": "Is it something you can find in a house?"}' \
-  "http://0.0.0.0:8500/taboo/ask_question?session_id=ab5e6153-b5b6-431d-ba2f-65bd1fa75ef3"
+  "http://0.0.0.0:8500/taboo/ask_question?session_id=67f15650-ea55-4cc8-9d0d-fa382123430e"
 
 
 curl -X POST \
   -H "Content-Type: application/json" \
   -d '{"user_response": "Is it an animal?"}' \
-  "http://0.0.0.0:8500/taboo/ask_question?session_id=ab5e6153-b5b6-431d-ba2f-65bd1fa75ef3"
+  "http://0.0.0.0:8500/taboo/ask_question?session_id=67f15650-ea55-4cc8-9d0d-fa382123430e"
 
 
 curl -X POST \
   -H "Content-Type: application/json" \
   -d '{"user_response": "Is it an eagle?"}' \
-  "http://0.0.0.0:8500/taboo/ask_question?session_id=ab5e6153-b5b6-431d-ba2f-65bd1fa75ef3"
+  "http://0.0.0.0:8500/taboo/ask_question?session_id=67f15650-ea55-4cc8-9d0d-fa382123430e"
 
 
 curl -X POST \
   -H "Content-Type: application/json" \
   -d '{"user_response": "Is it a desk?"}' \
-  "http://0.0.0.0:8500/taboo/ask_question?session_id=ab5e6153-b5b6-431d-ba2f-65bd1fa75ef3"
+  "http://0.0.0.0:8500/taboo/ask_question?session_id=67f15650-ea55-4cc8-9d0d-fa382123430e"
 ```
 
 
