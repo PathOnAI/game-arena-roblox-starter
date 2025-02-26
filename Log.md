@@ -4,6 +4,12 @@
 
 ## 02/25/2025, Tuesday
 
+### 2. Part 2
+1. set up the ai backend server for the ai-space-escape-engine-main using vercel and supabase
+
+
+### 1. Part 1
+
 1. set up the ai backend server for the ai-space-escape-engine-main
     * set up the api provider for the ai-space-escape-engine-main
 
@@ -30,10 +36,14 @@ curl -X POST \
 4. use ai npc sdk for chat
 https://www.roblox.com/games/82289819259183/SimpleChatGame
 
+![alt text](images/image-1.png)
 
 5. use ai npc sdk for action
 change the character name
 https://www.roblox.com/games/79072648104484/SimpleActionGame
+
+
+![alt text](images/image.png)
 
 6. add other components to the game
 terrain, apple, desk, chair, etc.
