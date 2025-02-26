@@ -9,9 +9,9 @@
 * debug the action generation module
 
 ### 2. Part 2
-1. set up the ai backend server for the ai-space-escape-engine-main using vercel and supabase
+* set up the ai backend server for the ai-space-escape-engine-main using vercel and supabase
   * in this repo
-2. ai backend for the SDK
+* ai backend for the SDK
   * in a separate repo
 
 
