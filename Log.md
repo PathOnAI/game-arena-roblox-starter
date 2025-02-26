@@ -4,8 +4,15 @@
 
 ## 02/25/2025, Tuesday
 
+### 3. Part 3
+* debug the perception module
+* debug the action generation module
+
 ### 2. Part 2
 1. set up the ai backend server for the ai-space-escape-engine-main using vercel and supabase
+  * in this repo
+2. ai backend for the SDK
+  * in a separate repo
 
 
 ### 1. Part 1
