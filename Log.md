@@ -2,6 +2,14 @@
 
 
 ## 02/26/2025, Wednesday
+ECS errors
+```
+On Apple Silicon (M1/M2) Macs, Docker builds images for the ARM architecture by default. If your AWS Fargate environment is running x86_64 (Intel/AMD) under the hood, trying to run an ARM-based image leads to exec format error.
+
+Conversely, if you build an x86 image but try to run it on an ARM-based environment (less common on Fargate), you’d get the same error. However, most Fargate tasks default to x86_64 unless you specifically configure Graviton/ARM.
+```
+
+
 ```
 pip freeze > requirements_2.txt
 
@@ -21,6 +29,23 @@ curl -X POST \
   "http://0.0.0.0:8500/taboo/ask_question?session_id=6656d1ba-bbf1-4bdc-b8ce-fdb2638b0b93"
 
 
+curl http://44.201.51.201:8500/
+
+
+curl -X POST "http://44.201.51.201:8500/taboo/start?model_name=claude-3-5-sonnet-20240620"
+
+
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"user_response": "Is it something you can find in a house?"}' \
+  "http://44.201.51.201:8500/taboo/ask_question?session_id=b6abf45c-dcdf-438b-b2d7-879f8cee8beb"
+
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"user_response": "Is it something you can find in a house?"}' \
+  "http://44.201.51.201:8500/taboo/ask_question?session_id=b6abf45c-dcdf-438b-b2d7-879f8cee8beb"
+{"ai_message":"Yes, it's quite common to find this item in many households. It serves a practical purpose and can be found in various rooms, depending on its specific type and use.","round":1,"game_over":false,"game_status":null,"end_reason":null}%  
+
 Local Development: You can still use a .env file and docker run --env-file .env ... locally.
 Production on Fargate: Move the needed environment variables (or secrets) into your ECS Task Definition or store them in AWS Secrets Manager/Parameter Store. This way, Fargate will inject them into the container at runtime.
 
@@ -29,7 +54,7 @@ Production on Fargate: Move the needed environment variables (or secrets) into y
   * set up the ai backend, use a database, don't use supabase for now since it is non-trivial to set up
 * used aws rds for the database, and trying to use vercel for the backend deployment [has error]
   * only use vercel for the frontend deployment [done]
-* deploy the backend to aws fargate
+* deploy the backend to aws fargate [done]
   * Step 1: Containerize your application
     * install docker
     * Dockerfile
@@ -39,9 +64,89 @@ Production on Fargate: Move the needed environment variables (or secrets) into y
       * docker run -p 8500:8500 --env-file .env ai-space-escape-engine-backend
     * taboo working
   * Step 2: Push the Docker Image to Amazon ECR
+    * aws configure
   * Step 3: Set Up AWS Fargate
+    * change security group to allow inbound traffic on port 8500
   * Step 4: Set Up Load Balancing (Optional)
   * Step 5: Access Your Application: Once everything is set up, you can access your application through the ALB's DNS name or the public IP of your Fargate task.
+
+
+Push the Docker Image to Amazon ECR
+```
+aws ecr create-repository --repository-name ai-space-escape-engine-backend --region us-east-1
+
+aws sts get-caller-identity --query Account --output text
+
+
+aws ecr get-login-password --region us-east-1 | \
+  docker login --username AWS --password-stdin 010526261030.dkr.ecr.us-east-1.amazonaws.com
+
+docker tag ai-space-escape-engine-backend:latest \
+  010526261030.dkr.ecr.us-east-1.amazonaws.com/ai-space-escape-engine-backend:latest
+
+docker push 010526261030.dkr.ecr.us-east-1.amazonaws.com/ai-space-escape-engine-backend:latest
+```
+
+
+```
+2. Create (or Use) an ECS Cluster
+If you don’t already have an ECS cluster set up for Fargate:
+
+Go to Amazon ECS in the AWS console.
+Click Clusters → Create Cluster → Networking Only (Fargate).
+Give it a name (e.g., fargate-cluster) and follow the prompts.
+3. Create an ECS Task Definition for Fargate
+A. Through the AWS Console
+Go to Amazon ECS → Task Definitions → Create new Task Definition.
+Select Fargate as the launch type.
+Name your task definition (e.g., ai-space-escape-engine-backend-task).
+Choose your Task Role if you need AWS permissions (e.g., reading from S3). Otherwise, leave it default.
+For Task Size, pick the CPU and memory that fits your app’s needs.
+Add Container Definition
+Click Add container.
+Container name: ai-space-escape-engine-backend (or anything you like).
+Image: The URI to your ECR image, e.g.:
+php-template
+Copy
+<AWS_ACCOUNT_ID>.dkr.ecr.<REGION>.amazonaws.com/ai-space-escape-engine-backend:latest
+Port mappings: Set container port to 8500 if that’s what your app listens on.
+Environment:
+You can add environment variables as key-value pairs right here. For example:
+ini
+Copy
+DB_USER = mydbuser
+DB_PASSWORD = secretpassword
+For secrets, use Add secrets to reference AWS Secrets Manager or Parameter Store. For example:
+ruby
+Copy
+Name: DB_PASSWORD
+Value from: arn:aws:secretsmanager:us-east-1:123456789012:secret:my-db-password
+Click Add.
+Finalize the Task Definition with the rest of your settings, then Create it.
+B. Using AWS Secrets Manager (Recommended for Sensitive Data)
+Store your secrets in AWS Secrets Manager (or Parameter Store). For example, store ANTHROPIC_API_KEY or database credentials.
+Copy the ARN of the secret.
+In the ECS Task Definition’s container definition, under Secrets, add an entry:
+Name: ANTHROPIC_API_KEY (this is how it appears in the container)
+Value From: arn:aws:secretsmanager:us-east-1:123456789012:secret:my-secret-key-XYZ
+Your container will see ANTHROPIC_API_KEY as an environment variable at runtime.
+
+4. Run Your Task or Create an ECS Service
+Run a one-off task
+In the ECS Console, go to Tasks → Run new task.
+Select your cluster, task definition, launch type (Fargate).
+Configure networking (e.g., choose a VPC and subnets).
+Click Run Task.
+Create a service
+If you want your container to stay running (like a web service), go to Services → Create:
+Launch type: Fargate
+Task definition: Choose the one you just created
+Cluster: The one you created (e.g., fargate-cluster)
+Service name: e.g., ai-space-escape-engine-service
+Desired tasks: How many copies of your container you want
+Network configuration: Select a VPC, subnets, and security group. Expose port 8500 if needed.
+Then Create Service. ECS will spin up your container on Fargate with the environment variables/secrets you defined.
+```
 
 
 ```
