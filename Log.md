@@ -10,10 +10,35 @@ python3.11 -m venv venv
 pip install -r requirements.txt
 ```
 
-* set up the ai backend server for the ai-space-escape-engine-main using vercel and supabase
-  * in this repo
-* set up the ai backend, use a database, don't use supabase for now since it is non-trivial to set up
-* set up supabase backend
+* set up the ai backend server for the ai-space-escape-engine-main using vercel and supabase [cancelled]
+  * in this repo 
+  * set up the ai backend, use a database, don't use supabase for now since it is non-trivial to set up
+* used aws rds for the database, and trying to use vercel for the backend deployment [has error]
+  * only use vercel for the frontend deployment [done]
+* deploy the backend to aws fargate
+  * Step 1: Containerize your application
+  * Step 2: Push the Docker Image to Amazon ECR
+  * Step 3: Set up AWS infrastructure
+  * Step 4: Deploy to Fargate
+
+
+```
+I now see the error messages in your updated logs, and it appears the deployment failed after the build completed. The error messages are:
+Copy16:17:45.830  Failed to process build result for "src/serve.py". Data: {"type":"Lambda"}.
+16:17:45.841  Error: data is too long
+This is likely not directly related to having too many dependencies in your requirements.txt file, but rather to Vercel's Lambda deployment limitations. Vercel deploys serverless functions (Lambda), and there's a size limit for these functions.
+The error "data is too long" suggests that your built application exceeds Vercel's size limits for Lambda functions. This can happen when:
+
+Your application code + dependencies combined are too large
+You might have large assets or models included in your deployment package
+The AI components of your Roblox backend might include substantial libraries or models
+
+For AWS Lambda (which Vercel uses), there's a deployment package size limit of 50MB for direct uploads and 250MB for layers, but Vercel might have stricter limits.
+Moving to AWS Fargate as you mentioned would be a good solution since Fargate is container-based and doesn't have the same size limitations as Lambda functions. Fargate would be better suited for larger applications, especially those with extensive dependencies or ML models.
+```
+
+
+
 
 ```
 Option 1: AWS RDS (Relational Database Service)
