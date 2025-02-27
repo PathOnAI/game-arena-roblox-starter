@@ -1,6 +1,108 @@
 # Log
 
 
+## 02/26/2025, Wednesday
+```
+pip freeze > requirements_2.txt
+
+python3.11 -m venv venv
+. venv/bin/activate
+pip install -r requirements.txt
+```
+
+* set up the ai backend server for the ai-space-escape-engine-main using vercel and supabase
+  * in this repo
+* set up the ai backend, use a database, don't use supabase for now since it is non-trivial to set up
+* set up supabase backend
+
+```
+Option 1: AWS RDS (Relational Database Service)
+This is the most robust enterprise solution:
+
+Migrate your schema and data to a PostgreSQL or MySQL database on RDS:
+
+Create an RDS instance of PostgreSQL or MySQL
+Use a migration tool like SQLAlchemy-Migrate or Alembic to convert your SQLite schema
+Import your data to the new database
+
+
+Update your connection string:
+pythonCopy# Instead of SQLite connection:
+SQLALCHEMY_DATABASE_URL = "postgresql://username:password@your-rds-endpoint:5432/dbname"
+# or 
+SQLALCHEMY_DATABASE_URL = "mysql+pymysql://username:password@your-rds-endpoint:3306/dbname"
+```
+
+
+```
+(venv) danqingzhang@danqings-mbp vercel-backend % python src/show_db_tables.py
+Database found at: /Users/danqingzhang/Desktop/learning/roblox-game-ai-backend/vercel-backend/users.db
+
+=== Using SQLite3 ===
+Found 4 tables:
+
+Table: game_sessions
+Columns (19):
+  - id: INTEGER (Primary Key)
+  - session_id: VARCHAR(36)
+  - user_id: INTEGER
+  - username: VARCHAR
+  - game_name: VARCHAR
+  - state: VARCHAR(7)
+  - target_phrase: VARCHAR
+  - model: VARCHAR
+  - share: BOOLEAN
+  - history: JSON
+  - timestamp: DATETIME
+  - round: INTEGER
+  - game_over: BOOLEAN
+  - game_status: VARCHAR
+  - level: INTEGER
+  - system_prompt: VARCHAR
+  - game_stat_change: JSON
+  - total_game_time: INTEGER
+  - escape_ai_room_id: VARCHAR
+Total rows: 25
+Sample data (up to 3 rows):
+  (1, '477e5896-9261-4c17-b815-0d2ca918df80', 0, 'anonymous', 'Taboo', 'PLAYING', 'Dolphin', 'gpt-4o-2024-11-20', 0, '[]', '2025-02-18 20:57:26', 0, 0, None, 1, "You are an astute assistant playing a word-guessing game. The user will have a secret word in mind, and your objective is to guess it. However, you must be cautious not to inadvertently say the word during the game. Review the history of the game carefully to inform your responses, ensuring you never mention the target word. Keep your answers logical and aligned with the game’s rules. The user’s questions won’t explicitly include the target word. The rules are as follows:\n\n1. Respond to Questions: Each turn, the user will ask a question. Respond accordingly while ensuring you avoid using the target word or forming a question.\n\n2. Avoid Losing Words: Avoid generating the target word or any similar words that could result in losing.\n\n3. Make Educated Guesses: Try to deduce the target word from the user’s questions, but do not ask directly about it.\n\n4. Guess Upon Losing: Only make a guess if you are sure or if you have accidentally said the word. Use this format: 'My guess of the word is: ...'.\n\n5. Maintain Natural Dialogue: Ensure that the conversation remains coherent and natural, without unnecessary elaboration.\n\n6. Optional End of Game Guess: After the fifth question, and only if you are confident, first answer the latest question, then make your final guess using this format: 'My guess of the word is: ...'.\n\n7. Post-Game Analysis: After making your guess, provide a reasoned analysis.\n\n8. Keep your response as concise as possible.\n\nThe game session starts now. Let's proceed:", None, None, None)
+  (2, '811efe4f-b34d-4841-a8ef-6f1b4940b3f7', 0, 'anonymous', 'Taboo', 'PLAYING', 'Bear', 'qwen-max', 0, '[]', '2025-02-18 21:02:03', 0, 0, None, 1, "You are a creative assistant engaged in a word-guessing game. The user will choose a target word, and your objective is to guess that word. Be mindful not to let the user trick you into saying the word unknowingly. Review the game history carefully to frame your responses, avoiding any mention of the target word. Ensure your responses align with the ongoing narrative and adhere strictly to the game's rules. Remember, the user’s messages will not explicitly state the word. The rules you must follow are:\n\n1. Respond to Questions: The user will ask a question each turn. Provide an answer that avoids using the target word or forming questions yourself.\n\n2. Avoid Losing Words: Do not generate the target word or any related words that could result in a loss.\n\n3. Make Educated Guesses: Based on the user’s inquiries, try to deduce the target word, but never ask directly about it.\n\n4. Guess Upon Losing: Make a guess only if you are confident or if you have accidentally said the word. Format your guess as: 'My guess of the word is: ...'.\n\n5. Maintain Natural Dialogue: Ensure the conversation flows naturally, without extraneous details.\n\n6. Optional End of Game Guess: After the fifth question, and only if confident, first answer the latest question, then make your final guess in the format: 'My guess of the word is: ...'.\n\n7. Post-Game Analysis: After your guess, provide an analysis to explain your reasoning.\n\n8. Keep your response as concise as possible.\n\nThe game session begins now. Let's start:", None, None, None)
+  (3, '41bbadbf-621c-4b00-933d-45819a3ced3d', 0, 'anonymous', 'Taboo', 'PLAYING', 'Fox', 'claude-3-5-sonnet-20240620', 0, '[]', '2025-02-18 21:03:54', 0, 0, None, 1, "You are an astute assistant playing a word-guessing game. The user will have a secret word in mind, and your objective is to guess it. However, you must be cautious not to inadvertently say the word during the game. Review the history of the game carefully to inform your responses, ensuring you never mention the target word. Keep your answers logical and aligned with the game’s rules. The user’s questions won’t explicitly include the target word. The rules are as follows:\n\n1. Respond to Questions: Each turn, the user will ask a question. Respond accordingly while ensuring you avoid using the target word or forming a question.\n\n2. Avoid Losing Words: Avoid generating the target word or any similar words that could result in losing.\n\n3. Make Educated Guesses: Try to deduce the target word from the user’s questions, but do not ask directly about it.\n\n4. Guess Upon Losing: Only make a guess if you are sure or if you have accidentally said the word. Use this format: 'My guess of the word is: ...'.\n\n5. Maintain Natural Dialogue: Ensure that the conversation remains coherent and natural, without unnecessary elaboration.\n\n6. Optional End of Game Guess: After the fifth question, and only if you are confident, first answer the latest question, then make your final guess using this format: 'My guess of the word is: ...'.\n\n7. Post-Game Analysis: After making your guess, provide a reasoned analysis.\n\n8. Keep your response as concise as possible.\n\nThe game session starts now. Let's proceed:", None, None, None)
+
+Table: user_stars
+Columns (5):
+  - roblox_id: INTEGER (Primary Key)
+  - username: VARCHAR
+  - stars: INTEGER
+  - consecutive_wins: INTEGER
+  - max_consecutive_wins: INTEGER
+Total rows: 1
+Sample data (up to 3 rows):
+  (0, 'anonymous', 7, 5, 5)
+
+Table: npc_sessions
+Columns (8):
+  - id: INTEGER (Primary Key)
+  - session_id: VARCHAR(36)
+  - username: VARCHAR
+  - npc_name: VARCHAR
+  - model: VARCHAR
+  - history: JSON
+  - system_prompt: VARCHAR
+  - timestamp: DATETIME
+Total rows: 0
+
+Table: action_sessions
+Columns (7):
+  - id: INTEGER (Primary Key)
+  - session_id: VARCHAR(36)
+  - username: VARCHAR
+  - model: VARCHAR
+  - history: JSON
+  - system_prompt: VARCHAR
+  - timestamp: DATETIME
+Total rows: 0
+```
+
 
 ## 02/25/2025, Tuesday
 
