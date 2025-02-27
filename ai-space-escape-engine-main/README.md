@@ -86,7 +86,7 @@ curl -X POST "http://0.0.0.0:8500/taboo/start?model_name=claude-3-5-sonnet-20240
 curl -X POST \
   -H "Content-Type: application/json" \
   -d '{"user_response": "Is it something you can find in a house?"}' \
-  "http://0.0.0.0:8500/taboo/ask_question?session_id=d6fd0bb9-4977-4091-b98c-b49836cb8a3d"
+  "http://0.0.0.0:8500/taboo/ask_question?session_id=f6db8563-3181-49fc-a36f-747f7475934a"
 
 
 curl -X POST \
