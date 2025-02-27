@@ -1,4 +1,7 @@
+.DS_Store
 __pycache__/
+vercel-backend/web_server.log*
+vercel-backend/src/config/*
 ai-space-escape-engine-main/web_server.log*
 ai-space-escape-engine-main/src/config/*
 venv

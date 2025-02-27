@@ -86,13 +86,13 @@ curl -X POST "http://0.0.0.0:8500/taboo/start?model_name=claude-3-5-sonnet-20240
 curl -X POST \
   -H "Content-Type: application/json" \
   -d '{"user_response": "Is it something you can find in a house?"}' \
-  "http://0.0.0.0:8500/taboo/ask_question?session_id=67f15650-ea55-4cc8-9d0d-fa382123430e"
+  "http://0.0.0.0:8500/taboo/ask_question?session_id=d6fd0bb9-4977-4091-b98c-b49836cb8a3d"
 
 
 curl -X POST \
   -H "Content-Type: application/json" \
   -d '{"user_response": "Is it an animal?"}' \
-  "http://0.0.0.0:8500/taboo/ask_question?session_id=67f15650-ea55-4cc8-9d0d-fa382123430e"
+  "http://0.0.0.0:8500/taboo/ask_question?session_id=e0cc839f-8e89-4a5b-9458-2be7b69e53c1"
 
 
 curl -X POST \
@@ -103,8 +103,13 @@ curl -X POST \
 
 curl -X POST \
   -H "Content-Type: application/json" \
-  -d '{"user_response": "Is it a desk?"}' \
-  "http://0.0.0.0:8500/taboo/ask_question?session_id=67f15650-ea55-4cc8-9d0d-fa382123430e"
+  -d '{"user_response": "Is it a lamp?"}' \
+  "http://0.0.0.0:8500/taboo/ask_question?session_id=e0cc839f-8e89-4a5b-9458-2be7b69e53c1"
+
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"user_response": "What is the purpose of the object?"}' \
+  "http://0.0.0.0:8500/taboo/ask_question?session_id=e0cc839f-8e89-4a5b-9458-2be7b69e53c1"
 ```
 
 
