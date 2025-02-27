@@ -10,6 +10,20 @@ python3.11 -m venv venv
 pip install -r requirements.txt
 ```
 
+curl http://0.0.0.0:8500/
+
+
+curl -X POST "http://0.0.0.0:8500/taboo/start?model_name=claude-3-5-sonnet-20240620"
+
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"user_response": "Is it something you can find in a house?"}' \
+  "http://0.0.0.0:8500/taboo/ask_question?session_id=6656d1ba-bbf1-4bdc-b8ce-fdb2638b0b93"
+
+
+Local Development: You can still use a .env file and docker run --env-file .env ... locally.
+Production on Fargate: Move the needed environment variables (or secrets) into your ECS Task Definition or store them in AWS Secrets Manager/Parameter Store. This way, Fargate will inject them into the container at runtime.
+
 * set up the ai backend server for the ai-space-escape-engine-main using vercel and supabase [cancelled]
   * in this repo 
   * set up the ai backend, use a database, don't use supabase for now since it is non-trivial to set up
@@ -17,9 +31,17 @@ pip install -r requirements.txt
   * only use vercel for the frontend deployment [done]
 * deploy the backend to aws fargate
   * Step 1: Containerize your application
+    * install docker
+    * Dockerfile
+    * build the docker image
+      * docker build -t ai-space-escape-engine-backend . 
+    * test the docker image locally
+      * docker run -p 8500:8500 --env-file .env ai-space-escape-engine-backend
+    * taboo working
   * Step 2: Push the Docker Image to Amazon ECR
-  * Step 3: Set up AWS infrastructure
-  * Step 4: Deploy to Fargate
+  * Step 3: Set Up AWS Fargate
+  * Step 4: Set Up Load Balancing (Optional)
+  * Step 5: Access Your Application: Once everything is set up, you can access your application through the ALB's DNS name or the public IP of your Fargate task.
 
 
 ```
