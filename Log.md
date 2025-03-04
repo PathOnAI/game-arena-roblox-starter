@@ -1,6 +1,11 @@
 # Log
 
 
+## 03/04/2025, Tuesday
+* test the backend for different api routes
+* test the fargate backend on roblox games
+* https://github.com/PathOnAI/awesome-3d-embodied-ai
+
 ## 02/26/2025, Wednesday
 ECS errors
 ```
