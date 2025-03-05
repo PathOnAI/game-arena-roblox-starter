@@ -6,7 +6,7 @@ local signals = require(game.ReplicatedStorage.Shared.signals)
 
 local HttpService = game:GetService("HttpService")
 local Players = game:GetService("Players")
-local gameState = require(game.ServerScriptService:WaitForChild("Server").gameState)
+-- local gameState = require(game.ServerScriptService:WaitForChild("Server").gameState)
 
 -- SETTINGS
 local delayAfterAIResponseBeforeInputIsAllowed = 0
@@ -157,8 +157,8 @@ local function finishGameSession(player, didPlayerWin, OptionalEndingScenarioFla
 	end
 	
 
-	signals.be:fire("set_room_id", player, gameState.aiEscapeRoomID)
-	print(string.format("[INFO] set_room_id fired: Player=%s, UserId=%d, RoomId=%s", player.Name, player.UserId, gameState.aiEscapeRoomID))
+	signals.be:fire("set_room_id", player, 1)
+	print(string.format("[INFO] set_room_id fired: Player=%s, UserId=%d, RoomId=%s", player.Name, player.UserId, 1))
 	playerSessions[player.UserId] = nil
 
 
@@ -207,7 +207,7 @@ local function PlayAnimation(animationName)
 	print("Playing animation:", animationName)
 
     -- Access the NPC instance from the gameState module
-    local npc = gameState.npc
+    local npc = workspace.npc
     if npc and npc:FindFirstChildOfClass("Humanoid") then
 
 		-- Find the right animation
@@ -338,7 +338,7 @@ end
 -- Send Elapsed Time
 local function sendElapsedTime(player)
     local sessionId = signals.bf:fire("get_session_id", player)
-    local roomId = gameState.aiEscapeRoomID
+    local roomId = 1
     local elapsedTime = signals.bf:fire("get_elapsed_time", player)
 
     -- Validate the data
@@ -450,6 +450,7 @@ end
 -- Handle player messages
 -- Return: Whether player input should be re-enabled after their current response is done processing
 local function handlePlayerInput(player, message, optionalChoiceIndex)
+	message = "test"
 	chosenDifficulty = DifficultySettings.getDifficulty(player)
 	-- Add Player's response to the log
 	table.insert(Log, {nickname = player.Name, content = message})
@@ -573,7 +574,7 @@ end
 -- Start the conversation with NPC
 local function startConvoWithNPC(player)
 	print("Starting NPC Conversation")
-	local npcName = gameState.npc.Name
+	local npcName = workspace.npc.Name
 
 	-- Pause timer sequence
 	signals.be:fire("pause_explode_timer", player)        -- Pauses local explode timer
@@ -693,7 +694,7 @@ local function startGameForPlayer(player, whichGame, optionalGameSecret)
 	local data = nil
 	local isUserProvidedWord = false
 
-	local roomId = gameState.aiEscapeRoomID
+	local roomId = 1
 
 	if whichGame == "akinator" then
 		isUserProvidedWord = true
@@ -974,6 +975,7 @@ local function tryToBuy(player, cost)
 end
 
 function module.init()
+	print("CypressAI init")
 	signals.rf:connect("send_msg_plr", handlePlayerInput)
 	signals.bf:connect("send_msg_plr", handlePlayerInput)
 
@@ -1014,6 +1016,7 @@ function module.init()
 		-- Clean up any session data
 		playerSessions[player.UserId] = nil
 	end)
+
 end
 
 return module
