@@ -24,11 +24,12 @@ def bluffing_start(
     level: Optional[int] = Query(default=1, ge=1, le=3, description="Specify the level of the game (1 to 3)"),
     user_id: Optional[int] = Query(default=0, description="Specify the user ID (default is 0)"),
     username: Optional[str] = Query(default="anonymous", description="Specify the username"),  # Added 'username' parameter
+    model_name: Optional[str] = Query(default="claude-3-5-sonnet-20240620", description="Specify the AI model to use"),
     db: Session = Depends(get_db)  # Added 'db' parameter for database session
 ):
     session_id = str(uuid.uuid4())
     difficulty = extract_difficulty(ingame_id)
-    game = BluffingGame(difficulty=difficulty, game_level=level, user_id=user_id, username=username)
+    game = BluffingGame(difficulty=difficulty, game_level=level, user_id=user_id, username=username, model_name=model_name)
     # games[session_id] = game  # Commented out; no longer using 'games' dict
 
     user_statement = game.system_question["bluffing_statement"]

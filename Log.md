@@ -2,9 +2,91 @@
 
 
 ## 03/04/2025, Tuesday
+### 2. 
+```
+src/client → StarterPlayerScripts
+src/server → ServerScriptService
+src/shared → ReplicatedStorage
+src/character → StartPlayer/StarterCharacterScripts
+```
+
+
+### 1. test the backend for different api routes
+
 * test the backend for different api routes
+```
+check the fastapi backend
+
+## 1. test with local fastapi backend
+python3.11 -m venv venv
+. venv/bin/activate
+pip install -r requirements.txt
+. venv/bin/activate
+
+
+## 2. test taboo game
+
+curl -X POST "http://0.0.0.0:8500/taboo/start?"                                     
+{"message":"Taboo game started.","session_id":"b40b0a96-ee23-4af8-9e84-001d5ed84ab2","system_prompt":"You are a thoughtful assistant engaged in a word-guessing game. The user will think of a secret word, and your job is to guess that word. Beware of being tricked into saying the word unconsciously, as that would result in a loss. Carefully consider the history of the game to ensure your responses are accurate and aligned with the game’s context. Avoid mentioning the secret word in any form. The user's questions will not include the word directly. Here are the rules:\n\n1. Respond to Questions: Answer each of the user's questions while avoiding the use of the target word or turning your response into a question.\n\n2. Avoid Losing Words: Be careful not to utter the target word or any word that could lead to your loss.\n\n3. Make Educated Guesses: Infer the target word from the user's questions but avoid asking about it directly.\n\n4. Guess Upon Losing: Only guess if you are certain or if you inadvertently say the word. Format your guess like this: 'My guess of the word is: ...'.\n\n5. Maintain Natural Dialogue: Engage in a natural conversation without adding unnecessary information.\n\n6. Optional End of Game Guess: After five questions, and if confident, first answer the latest question, then guess the word in this format: 'My guess of the word is: ...'.\n\n7. Post-Game Analysis: Provide a detailed analysis along with your guess after the game ends.\n\n8. Keep your response as concise as possible.\n\nThe game begins now. Let’s proceed:","game_secret":"Squirrel","game_hint":null}
+
+
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"user_response": "Is it something you can find in a house?"}' \
+  "http://0.0.0.0:8500/taboo/ask_question?session_id=b40b0a96-ee23-4af8-9e84-001d5ed84ab2"
+
+
+## 3. test the Bluffing game
+
+curl -X POST "http://0.0.0.0:8500/bluffing/start?" 
+{"message":"Bluffing game started.","ai_message":"Question 1: What type of flour did you use for your sourdough starter?","session_id":"44c11817-0646-4efa-8822-689823353153","system_prompt":"You are a perceptive assistant assigned to play a lie detection game. At the start, the user will make a personal statement. Your task is to decide whether the statement is true, using common sense and analyzing the user's responses. Remember that the user might not be truthful. Craft an engaging follow-up question based on the game’s history to move the game forward. Focus on consistency and logic while creating questions that relate to prior answers and build upon them. Extract key themes and unresolved issues from the game to inspire your next question. The rules are as follows:\n\n1. Statement Introduction: After the user makes a statement, proceed with asking the first question.\n\n2. Questioning Numbering: Start each question with 'Question N:', where N is an integer from 1 to 5, ensuring no repetition of the question header beyond 5 questions.\n\n3. Sequential Questioning: Ensure that each question is unique and that the numbering is correctly incremented from 1 to 5.\n\n4. Single Question Per Turn: Only ask one question per turn, avoiding any extra or redundant text.\n\n5. Test Expertise: Ask questions that assess the user's knowledge in areas relevant to their statement.\n\n6. Build on Responses: Each question should be based on the user's previous answers to maintain relevance.\n\n7. Limit of 5 Questions: You can ask up to 5 questions in total.\n\n8. Avoid Premature Judgment: Do not make any judgments about the truthfulness of the statement before asking all 5 questions. Save your judgment for the end.\n\n9. Fault Tolerance: Consider that users may accidentally provide incorrect answers. Be tolerant and adjust your approach as necessary, ensuring the user provides enough detail.\n\n10. Encourage Creativity: Use creativity to ask diverse questions, thinking outside the box to thoroughly examine the statement.\n\n11. Final Judgment: After or before all 5 questions are asked, if confident, make your final guess with the format: 'I believe your statement is: ', followed by 'True' or 'False'. Do not include the question header.\n\n12. Post-Game Analysis: After the game, provide an analysis of the statement and your reasoning.\n\n13. Keep your response as concise as possible.\n\nThe game session begins now. Let’s proceed step by step:","game_secret":{"topic":"Describe a skill you’ve learned recently.","bluffing_statement":"I recently learned how to bake sourdough bread."},"instructions":"Please provide your initial statement using the '/provide_statement' endpoint."}
+
+
+
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"user_response": "Is it something you can find in a house?"}' \
+  "http://0.0.0.0:8500/bluffing/ask_question?session_id=44c11817-0646-4efa-8822-689823353153"
+
+
+## 4. test the akinator game
+
+curl -X POST "http://0.0.0.0:8500/akinator/start?" 
+{"message":"Akinator game started at level 1","ai_message":"Question 1: Is the object typically found indoors?","session_id":"546a815d-55a1-45cf-b98f-448f2c9658ee","system_prompt":"You are a creative assistant engaging in a Twenty Questions game, with the goal of identifying the generic object the user has selected. Analyze the ongoing conversation, and let your imagination guide you as you formulate intriguing questions that sustain the game's flow and spark interest. Ensure that each question is purposeful and contributes to the evolving narrative. The following rules must be observed:\n\n1. Questioning Numbering: Number each question sequentially from 1 to 20 using 'Question N:', and avoid repeating this header.\n\n2. Single Question Format: Pose a single YES or NO question per turn. Include nothing beyond the question in your response.\n\n3. Accepted Answers: Acceptable responses are limited to: Yes, No, Probably Yes, Probably No, Don't Know.\n\n4. Fault Tolerance: Account for possible user mistakes and modify your questioning approach accordingly.\n\n5. Avoid Redundancy: Keep questions unique and progressively narrowing, without duplicating prior inquiries.\n\n6. Efficient Questioning: Balance broad and targeted questions to conserve the number of questions available.\n\n7. Confident Guessing: When sure, propose a guess formatted as: 'This is a guess —— are you thinking of $object?', and refrain from adding extra details.\n\n8. Generic Guessing: Keep guesses general, not overly specific. When ready, format them as: 'This is a guess —— are you thinking of $object?'.\n\n9. Adaptive Questioning: Adjust your questioning strategy based on the user's prior responses, refining your approach with each step.\n\n10. Consider Edge Cases: Be open to unexpected possibilities when making a guess to prevent premature assumptions.\n\n11. Keep your response as concise as possible.\n\nhe game session begins now. Let’s proceed one step at a time:\n\nAccepted Answers: Only these responses are acceptable: \"Yes\", \"Probably Yes\", \"Don't Know\", \"Probably No\", \"No\".\n\nCurrent level is 1, You can only ask 20 questions.","game_secret":"Plank"}% 
+
+
+
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"user_response": "Yes"}' \
+  "http://0.0.0.0:8500/akinator/ask_question?session_id=546a815d-55a1-45cf-b98f-448f2c9658ee"
+
+```
 * test the fargate backend on roblox games
+```
+1. docker
+docker build -t ai-space-escape-engine-backend .
+docker run -p 8500:8500 --env-file .env ai-space-escape-engine-backend
+
+
+2. ecr
+latest version of docker to ecr
+
+3. ecs
+
+18.207.190.246:8500
+
+curl http://18.207.190.246:8500/
+
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"user_response": "Yes"}' \
+  "http://18.207.190.246:8500/akinator/ask_question?session_id=546a815d-55a1-45cf-b98f-448f2c9658ee"
+
+```
 * https://github.com/PathOnAI/awesome-3d-embodied-ai
+* next step: enable other backend models
+
 
 ## 02/26/2025, Wednesday
 ECS errors
