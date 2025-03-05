@@ -179,6 +179,42 @@ Players.PlayerAdded:Connect(function(player)
     task.wait(5) -- Wait for player to fully load
     print("SERVER: New player joined:", player.Name)
     ChatEvent:FireClient(player, "Welcome to the game! I'm the Loader NPC. Press E near me to chat!")
+
+    -- Handle chat messages
+    player.Chatted:Connect(function(message)
+        print("SERVER: Received message from", player.Name, ":", userMessage)
+        
+        if not loaderNPC then
+            loaderNPC = findLoaderNPC() -- Try to find it again
+            if loaderNPC then
+                print("SERVER: Found loader NPC on retry:", loaderNPC:GetFullName())
+            else
+                print("SERVER: Still couldn't find loader NPC")
+            end
+        end
+        
+        local npcName = loaderNPC and loaderNPC.Name or "Loader"
+        local response = "Hello, " .. player.Name .. "! I'm " .. npcName .. ". You said: " .. userMessage
+        
+        -- If we found the NPC, make it look at the player
+        if loaderNPC then
+            local humanoid = loaderNPC:FindFirstChild("Humanoid")
+            local hrp = loaderNPC:FindFirstChild("HumanoidRootPart")
+            local playerHRP = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+            
+            if humanoid and hrp and playerHRP then
+                -- Make the NPC face the player when talking
+                humanoid:MoveTo(hrp.Position) -- Stop any movement
+                hrp.CFrame = CFrame.new(hrp.Position, Vector3.new(playerHRP.Position.X, hrp.Position.Y, playerHRP.Position.Z))
+                print("SERVER: Made NPC face player")
+            end
+        end
+        
+        print("SERVER: Sending response to", player.Name, ":", response)
+        ChatEvent:FireClient(player, loaderNPC, response)
+    end)
+
+
 end)
 
 print("SERVER: NPCChatServer fully initialized")

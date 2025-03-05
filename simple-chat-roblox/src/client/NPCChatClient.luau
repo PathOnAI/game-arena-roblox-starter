@@ -5,6 +5,10 @@ local ContextActionService = game:GetService("ContextActionService")
 
 local player = Players.LocalPlayer
 
+local TextChatService = game:GetService("TextChatService")
+local Players = game:GetService("Players")
+
+
 -- Create or get the ChatEvent RemoteEvent
 local function getChatEvent()
     local chatEvent = ReplicatedStorage:FindFirstChild("ChatEvent")
@@ -25,6 +29,34 @@ end
 
 local ChatEvent = getChatEvent()
 local playerGui = player:WaitForChild("PlayerGui")
+
+-- Function to format message with character name
+local function formatChatMessage(npcChar, msg)
+	return string.format("<font color=\"rgb(%d,%d,%d)\">%s</font>: %s",
+		chatConfig.nameColor.R * 255,
+		chatConfig.nameColor.G * 255,
+		chatConfig.nameColor.B * 255,
+		npcChar.Name,
+		msg
+	)
+end
+
+local function displayStandardMsg(npcChar, msg)
+		local player = Players.LocalPlayer
+		if not player then return end
+
+		local formattedChatMsg = formatChatMessage(npcChar, msg)
+
+		-- System message in chat
+		local textChannel = TextChatService.TextChannels.RBXGeneral
+		textChannel:DisplaySystemMessage(formattedChatMsg)
+
+		-- Display bubble chat with filtered message
+		TextChatService:DisplayBubble(npcChar.Head, msg)
+end
+
+ChatEvent.OnClientEvent:Connect(displayStandardMsg)
+
 
 -- Create a key detection label
 local function createKeyDetectionLabel()
