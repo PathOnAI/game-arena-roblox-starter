@@ -11,8 +11,7 @@ local gameState = require(game.ServerScriptService:WaitForChild("Server").gameSt
 -- SETTINGS
 local delayAfterAIResponseBeforeInputIsAllowed = 0
 local delayBeforeShowingGameStatus = 4
-local AppUrl = "{your ngrok app address}"  -- Replace with your actual ngrok URL
-local API_Key = "{your API key}" -- Used for authorization
+local AppUrl = "http://18.207.190.246:8500/"  -- Your actual server URL
 local BotName = "Cypress AI"
 local LogSize = 20
 local AnswerEverynMessages = 1
@@ -73,13 +72,13 @@ local function fetchUserMetadata(player)
 
     print("Fetching user metadata for Roblox ID:", player.UserId)
 
-    local success, response = pcall(function()
-        return HttpService:GetAsync(
-            url,
-            false, -- Do not compress
-            { ["Authorization"] = "Bearer " .. API_Key } -- Headers
-        )
-    end)
+	-- For GET requests
+	local success, response = pcall(function()
+		return HttpService:GetAsync(
+			url,
+			false -- Do not compress
+		)
+	end)
 
     if success then
         print("GET request successful.")
@@ -313,13 +312,13 @@ end
 -- Send post request
 local function sendPostRequest(url, requestBody)
 	print("Sending POST request to the server. URL:", url)
+	-- For POST requests
 	local success, response = pcall(function()
 		return HttpService:PostAsync(
 			url,
 			requestBody,
 			Enum.HttpContentType.ApplicationJson,  -- ContentType
-			false,  -- compress
-			{ ["Authorization"] = "Bearer " ..API_Key} -- Headers
+			false  -- compress
 		)
 	end)
 
