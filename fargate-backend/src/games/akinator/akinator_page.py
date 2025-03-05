@@ -27,6 +27,7 @@ def akinator_start(
     secret_word: Optional[str] = Query(default="apple", description="Specify the username"),
     level: Optional[int] = Query(default=1, ge=1, le=3, description="Specify the level of the game (1 to 3)"),
     user_id: Optional[int] = Query(default=0, description="Specify the user ID (default is 0)"),
+    model_name: Optional[str] = Query(default="claude-3-5-sonnet-20240620", description="Specify the AI model to use"),
     username: Optional[str] = Query(default="anonymous", description="Specify the username"),  # Added 'username' parameter
     db: Session = Depends(get_db)  # Added 'db' parameter for database session
 ):
@@ -59,10 +60,10 @@ def akinator_start(
     secret_word = extract_first_word(secret_word)
 
     if use_secret_word:
-        game = AkinatorGame(level=level, difficulty=difficulty, user_id=user_id, username=username, game_secret=secret_word)
+        game = AkinatorGame(level=level, difficulty=difficulty, user_id=user_id, username=username, game_secret=secret_word, model_name=model_name)
         game.user_provided_secret = True
     else:
-        game = AkinatorGame(level=level, difficulty=difficulty, user_id=user_id, username=username)
+        game = AkinatorGame(level=level, difficulty=difficulty, user_id=user_id, username=username, model_name=model_name)
     # games[session_id] = game  # Commented out; no longer using "games" dict
 
     game.initialize_game(game.conversation)
