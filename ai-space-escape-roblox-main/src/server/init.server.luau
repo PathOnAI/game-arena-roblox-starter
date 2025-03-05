@@ -1,24 +1,24 @@
 print("Server Init")
 local signals = require(game.ReplicatedStorage.Shared.signals)
 
-local gameState = require(game.ServerScriptService.Server.gameState)
-local explodeShip = require(game.ServerScriptService.Server.explodeShip)
+-- local gameState = require(game.ServerScriptService.Server.gameState)
+-- local explodeShip = require(game.ServerScriptService.Server.explodeShip)
 
-gameState.init()
+-- gameState.init()
 
 local cypressAI = require(game.ServerScriptService.Server.CypressAI)
 cypressAI.init()
 
-require(game.ServerScriptService.Server.brickTypes).init()
+-- require(game.ServerScriptService.Server.brickTypes).init()
 
-require(game.ServerScriptService.Server.Modules.filterText):init()
-require(game.ServerScriptService.Server.Modules.currencyManager):init()
+-- require(game.ServerScriptService.Server.Modules.filterText):init()
+-- require(game.ServerScriptService.Server.Modules.currencyManager):init()
 
 require(game.ServerScriptService.Server.shop).init()
 
-require(game.ServerScriptService.Server.explodeShip).init()
+-- require(game.ServerScriptService.Server.explodeShip).init()
 
-require(game.ServerScriptService.Server.Modules.BadgeManager).init()
+-- require(game.ServerScriptService.Server.Modules.BadgeManager).init()
 
 print("Server Init OK!")
 
