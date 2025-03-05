@@ -1,6 +1,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
+local ContextActionService = game:GetService("ContextActionService")
 
 local player = Players.LocalPlayer
 print("NPC Chat Client loading for", player.Name)
@@ -34,6 +35,47 @@ end
 local ChatEvent = getChatEvent()
 
 local playerGui = player:WaitForChild("PlayerGui")
+
+-- Create a key detection label to debug keyboard input
+local function createKeyDetectionLabel()
+    -- Check if it already exists
+    if playerGui:FindFirstChild("KeyDetector") then
+        return playerGui.KeyDetector.Frame.Label
+    end
+    
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "KeyDetector"
+    gui.ResetOnSpawn = false
+    gui.Parent = playerGui
+    
+    local frame = Instance.new("Frame")
+    frame.Name = "Frame"
+    frame.Size = UDim2.new(0, 200, 0, 40)
+    frame.Position = UDim2.new(0, 10, 0, 10)
+    frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    frame.BackgroundTransparency = 0.5
+    frame.Parent = gui
+    
+    local label = Instance.new("TextLabel")
+    label.Name = "Label"
+    label.Size = UDim2.new(1, -10, 1, -10)
+    label.Position = UDim2.new(0, 5, 0, 5)
+    label.Text = "Press any key to test"
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.BackgroundTransparency = 1
+    label.TextSize = 14
+    label.Font = Enum.Font.SourceSans
+    label.Parent = frame
+    
+    -- Add rounded corners
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = frame
+    
+    return label
+end
+
+local keyLabel = createKeyDetectionLabel()
 
 -- Create a simple chat GUI
 local function createChatGui()
@@ -177,16 +219,6 @@ local function createChatGui()
         mainFrame.Visible = false
     end)
     
-    -- Add keypress shortcut to toggle chat (T key)
-    UserInputService.InputBegan:Connect(function(input)
-        if input.KeyCode == Enum.KeyCode.T and not inputBox:IsFocused() then
-            mainFrame.Visible = not mainFrame.Visible
-            if mainFrame.Visible then
-                inputBox:CaptureFocus()
-            end
-        end
-    end)
-    
     print("CLIENT: Chat GUI created")
     return chatGui
 end
@@ -202,8 +234,8 @@ local function createProximityIndicator()
     proximityGui.Parent = playerGui
     
     local indicator = Instance.new("TextLabel")
-    indicator.Size = UDim2.new(0, 200, 0, 50)
-    indicator.Position = UDim2.new(0.5, -100, 0.2, 0)
+    indicator.Size = UDim2.new(0, 300, 0, 50)
+    indicator.Position = UDim2.new(0.5, -150, 0.2, 0)
     indicator.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     indicator.BackgroundTransparency = 0.5
     indicator.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -270,36 +302,33 @@ local function checkNearNPC()
     local hrp = character:FindFirstChild("HumanoidRootPart")
     if not hrp then return false end
     
+    -- Replace the findLoaderNPC function in NPCChatClient.luau with this improved version
     local function findLoaderNPC()
         local workspace = game:GetService("Workspace")
         
-        -- Check for "Loader" (case-sensitive)
+        -- In Studio, the NPC is named "Loader"
+        -- But when playing, it becomes "Roblox"
+        if workspace:FindFirstChild("Roblox") then
+            print("CLIENT: Found NPC as Roblox model")
+            return workspace.Roblox
+        end
+        
+        -- Fallback to original name
         if workspace:FindFirstChild("Loader") then
+            print("CLIENT: Found NPC as Loader model")
             return workspace.Loader
         end
         
-        -- Check for "loader" (lowercase)
-        if workspace:FindFirstChild("loader") then
-            return workspace.loader
-        end
-        
-        -- Check inside npc folder
-        if workspace:FindFirstChild("npc") then
-            if workspace.npc:FindFirstChild("Loader") then
-                return workspace.npc.Loader
-            end
-            if workspace.npc:FindFirstChild("loader") then
-                return workspace.npc.loader
-            end
-        end
-        
-        -- Search for any models named loader
+        -- Last fallback - find any character model that isn't the player
+        local playerChar = game.Players.LocalPlayer.Character
         for _, obj in pairs(workspace:GetChildren()) do
-            if (obj.Name == "Loader" or obj.Name:lower() == "loader") and obj:IsA("Model") then
+            if obj:IsA("Model") and obj ~= playerChar and obj:FindFirstChild("Humanoid") then
+                print("CLIENT: Found fallback NPC:", obj.Name)
                 return obj
             end
         end
         
+        print("CLIENT: Could not find NPC model")
         return nil
     end
     
@@ -350,9 +379,16 @@ task.spawn(function()
     end
 end)
 
--- Add E key to interact with NPCs
-UserInputService.InputBegan:Connect(function(input)
-    if input.KeyCode == Enum.KeyCode.E then
+-- Direct keyboard handler
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    -- Update key detection display
+    if input.KeyCode ~= Enum.KeyCode.Unknown then
+        keyLabel.Text = "Key pressed: " .. input.KeyCode.Name
+    end
+    
+    -- E key handler - only if not processed by something else
+    if input.KeyCode == Enum.KeyCode.E and not gameProcessed then
+        print("CLIENT: E key pressed directly")
         local isNear, distance, loaderNPC = checkNearNPC()
         
         if isNear and loaderNPC then
@@ -365,10 +401,59 @@ UserInputService.InputBegan:Connect(function(input)
             print("CLIENT: Sending initial Hello message")
             ChatEvent:FireServer("Hello")
         else
-            print("CLIENT: Not near NPC, distance:", distance)
+            print("CLIENT: Not near NPC, distance:", distance or "unknown")
         end
     end
+    
+    -- T key handler for chat toggle
+    if input.KeyCode == Enum.KeyCode.T and not gameProcessed then
+        print("CLIENT: T key pressed to toggle chat")
+        local mainFrame = chatGui.MainFrame
+        mainFrame.Visible = not mainFrame.Visible
+        
+        if mainFrame.Visible and mainFrame.InputFrame and mainFrame.InputFrame.InputBox then
+            mainFrame.InputFrame.InputBox:CaptureFocus()
+        end
+    end
+    
+    -- P key for testing
+    if input.KeyCode == Enum.KeyCode.P and not gameProcessed then
+        print("CLIENT: P key pressed for testing")
+        ChatEvent:FireServer("Test message from P key")
+    end
 end)
+
+-- Add interactions using ContextActionService for better mobile support
+ContextActionService:BindAction(
+    "NPCChat_Interact", 
+    function(actionName, inputState, inputObject)
+        if inputState == Enum.UserInputState.Begin then
+            print("CLIENT: E key pressed through ContextActionService")
+            
+            local isNear, distance, loaderNPC = checkNearNPC()
+            
+            if isNear and loaderNPC then
+                print("CLIENT: Interacting with NPC at distance:", distance)
+                -- Show chat GUI and send initial message
+                chatGui.MainFrame.Visible = true
+                chatGui.MainFrame.InputFrame.InputBox:CaptureFocus()
+                
+                -- Send initial greeting
+                print("CLIENT: Sending initial Hello message through CAS")
+                ChatEvent:FireServer("Hello")
+                
+                return Enum.ContextActionResult.Sink  -- Consume the input
+            else
+                print("CLIENT: Not near NPC, distance:", distance or "unknown")
+                return Enum.ContextActionResult.Pass  -- Allow the input to continue
+            end
+        end
+        
+        return Enum.ContextActionResult.Pass
+    end,
+    false,  -- Don't create touch button
+    Enum.KeyCode.E  -- Bind to E key
+)
 
 -- Simple direct test to confirm communication works
 -- Wait a moment to ensure everything is loaded
@@ -376,3 +461,6 @@ task.wait(2)
 print("CLIENT: Testing direct server communication...")
 ChatEvent:FireServer("Test message from client")
 print("CLIENT: NPC Chat Client initialized")
+
+-- Return true to avoid "did not return exactly one value" error
+return true
