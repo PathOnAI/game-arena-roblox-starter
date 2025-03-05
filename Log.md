@@ -1,8 +1,19 @@
 # Log
 
 
+## 03/05/2025, Wednesday
+### 1. simple chat roblox game in rojo project format
+* connect with ai backend of ai-space-escape-engine-main
+  * chat interface
+* connect the output of the response with one NPC action
+
 ## 03/04/2025, Tuesday
+### 3. simple chat roblox game in rojo project format
+https://github.com/PathOnAI/roblox-game-ai-backend/tree/main/simple-chat-roblox
+
+
 ### 2. connect the backend to the roblox game
+non-trivial to do this
 ```
 ## 1. change http service configuration
 
