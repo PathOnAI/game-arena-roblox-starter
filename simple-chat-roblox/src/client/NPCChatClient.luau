@@ -34,6 +34,7 @@ local function displayStandardMsg(npcChar, msg)
 	local player = Players.LocalPlayer
 	if not player then return end
 
+
 	local formattedChatMsg = "[" .. npcChar.name .. "]" .. msg
 
 	-- System message in chat
