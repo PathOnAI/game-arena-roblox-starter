@@ -33,6 +33,6 @@ end
 safeRequire("NPCChatClient")
 
 -- Also load the test script if it exists
-safeRequire("TestChatScript")
+-- safeRequire("TestChatScript")
 
 print("Client initialization completed!")

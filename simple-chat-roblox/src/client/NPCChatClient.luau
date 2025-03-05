@@ -4,41 +4,30 @@ local UserInputService = game:GetService("UserInputService")
 local ContextActionService = game:GetService("ContextActionService")
 
 local player = Players.LocalPlayer
-print("NPC Chat Client loading for", player.Name)
 
 -- Create or get the ChatEvent RemoteEvent
 local function getChatEvent()
     local chatEvent = ReplicatedStorage:FindFirstChild("ChatEvent")
     
     if not chatEvent then
-        -- If it doesn't exist, create it
         chatEvent = Instance.new("RemoteEvent")
         chatEvent.Name = "ChatEvent"
         chatEvent.Parent = ReplicatedStorage
-        print("CLIENT: Created new ChatEvent RemoteEvent in ReplicatedStorage")
     elseif not chatEvent:IsA("RemoteEvent") then
-        -- If it exists but is not a RemoteEvent, replace it
-        print("CLIENT: Warning: Found ChatEvent but it's a " .. chatEvent.ClassName .. ", replacing with RemoteEvent")
         chatEvent:Destroy()
-        
         chatEvent = Instance.new("RemoteEvent")
         chatEvent.Name = "ChatEvent"
         chatEvent.Parent = ReplicatedStorage
-        print("CLIENT: Replaced with proper RemoteEvent")
     end
     
-    print("CLIENT: Using ChatEvent:", chatEvent:GetFullName())
     return chatEvent
 end
 
--- Get the proper ChatEvent RemoteEvent
 local ChatEvent = getChatEvent()
-
 local playerGui = player:WaitForChild("PlayerGui")
 
--- Create a key detection label to debug keyboard input
+-- Create a key detection label
 local function createKeyDetectionLabel()
-    -- Check if it already exists
     if playerGui:FindFirstChild("KeyDetector") then
         return playerGui.KeyDetector.Frame.Label
     end
@@ -67,7 +56,6 @@ local function createKeyDetectionLabel()
     label.Font = Enum.Font.SourceSans
     label.Parent = frame
     
-    -- Add rounded corners
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 8)
     corner.Parent = frame
@@ -77,9 +65,8 @@ end
 
 local keyLabel = createKeyDetectionLabel()
 
--- Create a simple chat GUI
+-- Create an improved chat GUI
 local function createChatGui()
-    -- Check if it already exists
     if playerGui:FindFirstChild("NPCChatGui") then
         return playerGui.NPCChatGui
     end
@@ -89,123 +76,202 @@ local function createChatGui()
     chatGui.ResetOnSpawn = false
     chatGui.Parent = playerGui
     
+    -- Main frame with better styling
     local mainFrame = Instance.new("Frame")
     mainFrame.Name = "MainFrame"
-    mainFrame.Size = UDim2.new(0, 400, 0, 300)
-    mainFrame.Position = UDim2.new(0.5, -200, 0.7, -150)
-    mainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    mainFrame.BackgroundTransparency = 0.3
+    mainFrame.Size = UDim2.new(0, 450, 0, 350)
+    mainFrame.Position = UDim2.new(0.5, -225, 0.6, -150)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+    mainFrame.BackgroundTransparency = 0.1
     mainFrame.BorderSizePixel = 0
     mainFrame.Visible = false
     mainFrame.Parent = chatGui
     
+    -- Add rounded corners to main frame
+    local frameCorner = Instance.new("UICorner")
+    frameCorner.CornerRadius = UDim.new(0, 10)
+    frameCorner.Parent = mainFrame
+    
+    -- Add a header with NPC name
+    local headerFrame = Instance.new("Frame")
+    headerFrame.Name = "HeaderFrame"
+    headerFrame.Size = UDim2.new(1, 0, 0, 40)
+    headerFrame.BackgroundColor3 = Color3.fromRGB(40, 45, 65)
+    headerFrame.BackgroundTransparency = 0.1
+    headerFrame.BorderSizePixel = 0
+    headerFrame.Parent = mainFrame
+    
+    -- Round just the top corners of header
+    local headerCorner = Instance.new("UICorner")
+    headerCorner.CornerRadius = UDim.new(0, 10)
+    headerCorner.Parent = headerFrame
+    
+    local headerTitle = Instance.new("TextLabel")
+    headerTitle.Name = "HeaderTitle"
+    headerTitle.Size = UDim2.new(1, -50, 1, 0)
+    headerTitle.Position = UDim2.new(0, 15, 0, 0)
+    headerTitle.BackgroundTransparency = 1
+    headerTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+    headerTitle.TextSize = 18
+    headerTitle.Font = Enum.Font.GothamMedium
+    headerTitle.TextXAlignment = Enum.TextXAlignment.Left
+    headerTitle.Text = "Chat with NPC"
+    headerTitle.Parent = headerFrame
+    
+    -- Close button
+    local closeButton = Instance.new("TextButton")
+    closeButton.Name = "CloseButton"
+    closeButton.Size = UDim2.new(0, 30, 0, 30)
+    closeButton.Position = UDim2.new(1, -35, 0, 5)
+    closeButton.BackgroundColor3 = Color3.fromRGB(200, 60, 60)
+    closeButton.BackgroundTransparency = 0.2
+    closeButton.BorderSizePixel = 0
+    closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    closeButton.TextSize = 18
+    closeButton.Font = Enum.Font.GothamBold
+    closeButton.Text = "X"
+    closeButton.Parent = headerFrame
+    
+    -- Rounded close button
+    local closeCorner = Instance.new("UICorner")
+    closeCorner.CornerRadius = UDim.new(0, 8)
+    closeCorner.Parent = closeButton
+    
+    -- Message frame with better styling
     local messageFrame = Instance.new("ScrollingFrame")
     messageFrame.Name = "MessageFrame"
-    messageFrame.Size = UDim2.new(1, -20, 0.8, -20)
-    messageFrame.Position = UDim2.new(0, 10, 0, 10)
-    messageFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    messageFrame.Size = UDim2.new(1, -20, 1, -110)
+    messageFrame.Position = UDim2.new(0, 10, 0, 50)
+    messageFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
     messageFrame.BackgroundTransparency = 0.5
     messageFrame.BorderSizePixel = 0
     messageFrame.ScrollBarThickness = 6
+    messageFrame.ScrollBarImageColor3 = Color3.fromRGB(80, 80, 100)
     messageFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
     messageFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
     messageFrame.Parent = mainFrame
     
+    -- Rounded message frame
+    local messageCorner = Instance.new("UICorner")
+    messageCorner.CornerRadius = UDim.new(0, 8)
+    messageCorner.Parent = messageFrame
+    
+    -- Message layout for better spacing
+    local messageLayout = Instance.new("UIListLayout")
+    messageLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    messageLayout.Padding = UDim.new(0, 10)
+    messageLayout.Parent = messageFrame
+    
+    local messagePadding = Instance.new("UIPadding")
+    messagePadding.PaddingTop = UDim.new(0, 10)
+    messagePadding.PaddingBottom = UDim.new(0, 10)
+    messagePadding.PaddingLeft = UDim.new(0, 10)
+    messagePadding.PaddingRight = UDim.new(0, 10)
+    messagePadding.Parent = messageFrame
+    
+    -- Input frame with better styling
     local inputFrame = Instance.new("Frame")
     inputFrame.Name = "InputFrame"
-    inputFrame.Size = UDim2.new(1, -20, 0.2, -10)
-    inputFrame.Position = UDim2.new(0, 10, 0.8, 0)
-    inputFrame.BackgroundTransparency = 1
+    inputFrame.Size = UDim2.new(1, -20, 0, 50)
+    inputFrame.Position = UDim2.new(0, 10, 1, -60)
+    inputFrame.BackgroundColor3 = Color3.fromRGB(40, 45, 65)
+    inputFrame.BackgroundTransparency = 0.5
+    inputFrame.BorderSizePixel = 0
     inputFrame.Parent = mainFrame
     
+    -- Rounded input frame
+    local inputCorner = Instance.new("UICorner")
+    inputCorner.CornerRadius = UDim.new(0, 8)
+    inputCorner.Parent = inputFrame
+    
+    -- Input text box
     local inputBox = Instance.new("TextBox")
     inputBox.Name = "InputBox"
-    inputBox.Size = UDim2.new(0.8, -10, 1, 0)
-    inputBox.Position = UDim2.new(0, 0, 0, 0)
-    inputBox.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    inputBox.BackgroundTransparency = 0.3
+    inputBox.Size = UDim2.new(1, -100, 1, -10)
+    inputBox.Position = UDim2.new(0, 10, 0, 5)
+    inputBox.BackgroundColor3 = Color3.fromRGB(50, 55, 75)
+    inputBox.BackgroundTransparency = 0.2
     inputBox.BorderSizePixel = 0
     inputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-    inputBox.TextSize = 18
+    inputBox.TextSize = 16
+    inputBox.Font = Enum.Font.Gotham
     inputBox.TextXAlignment = Enum.TextXAlignment.Left
     inputBox.TextWrapped = true
     inputBox.ClearTextOnFocus = false
     inputBox.PlaceholderText = "Type your message here..."
     inputBox.Parent = inputFrame
     
+    -- Rounded input box
+    local boxCorner = Instance.new("UICorner")
+    boxCorner.CornerRadius = UDim.new(0, 6)
+    boxCorner.Parent = inputBox
+    
+    -- Send button
     local sendButton = Instance.new("TextButton")
     sendButton.Name = "SendButton"
-    sendButton.Size = UDim2.new(0.2, 0, 1, 0)
-    sendButton.Position = UDim2.new(0.8, 0, 0, 0)
-    sendButton.BackgroundColor3 = Color3.fromRGB(0, 120, 215)
+    sendButton.Size = UDim2.new(0, 80, 1, -10)
+    sendButton.Position = UDim2.new(1, -90, 0, 5)
+    sendButton.BackgroundColor3 = Color3.fromRGB(60, 120, 200)
     sendButton.BorderSizePixel = 0
     sendButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    sendButton.TextSize = 18
+    sendButton.TextSize = 16
+    sendButton.Font = Enum.Font.GothamBold
     sendButton.Text = "Send"
     sendButton.Parent = inputFrame
     
-    local closeButton = Instance.new("TextButton")
-    closeButton.Name = "CloseButton"
-    closeButton.Size = UDim2.new(0, 30, 0, 30)
-    closeButton.Position = UDim2.new(1, -35, 0, 5)
-    closeButton.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
-    closeButton.BorderSizePixel = 0
-    closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    closeButton.TextSize = 18
-    closeButton.Text = "X"
-    closeButton.Parent = mainFrame
+    -- Rounded send button
+    local sendCorner = Instance.new("UICorner")
+    sendCorner.CornerRadius = UDim.new(0, 6)
+    sendCorner.Parent = sendButton
     
-    -- Make UI elements rounded
-    local function makeRounded(guiObject, radius)
-        local uiCorner = Instance.new("UICorner")
-        uiCorner.CornerRadius = UDim.new(0, radius or 8)
-        uiCorner.Parent = guiObject
-    end
-    
-    makeRounded(mainFrame, 10)
-    makeRounded(messageFrame, 8)
-    makeRounded(inputBox, 8)
-    makeRounded(sendButton, 8)
-    makeRounded(closeButton, 15)
-    
-    -- Helper function to add message
-    local function addMessage(sender, message, color)
-        local messageLabel = Instance.new("TextLabel")
-        messageLabel.Name = "Message"
-        messageLabel.Size = UDim2.new(1, -16, 0, 0)
-        messageLabel.AutomaticSize = Enum.AutomaticSize.Y
-        messageLabel.BackgroundTransparency = 1
-        messageLabel.TextColor3 = color or Color3.fromRGB(255, 255, 255)
-        messageLabel.TextSize = 16
-        messageLabel.Font = Enum.Font.SourceSans
-        messageLabel.TextWrapped = true
-        messageLabel.TextXAlignment = Enum.TextXAlignment.Left
-        messageLabel.Text = sender .. ": " .. message
-        messageLabel.Parent = messageFrame
-        
-        -- Add padding between messages
-        local padding = Instance.new("UIPadding")
-        padding.PaddingTop = UDim.new(0, 8)
-        padding.PaddingBottom = UDim.new(0, 8)
-        padding.PaddingLeft = UDim.new(0, 8)
-        padding.PaddingRight = UDim.new(0, 8)
-        padding.Parent = messageLabel
-        
-        -- Scroll to bottom
-        messageFrame.CanvasPosition = Vector2.new(0, messageFrame.CanvasSize.Y.Offset)
-    end
-    
-    -- Send message when button clicked or Enter pressed
+    -- Send message function
     local function sendMessage()
         local message = inputBox.Text
         if message and message ~= "" then
-            addMessage("You", message, Color3.fromRGB(100, 200, 255))
-            print("CLIENT: Sending message to server:", message)
+            -- Create player message directly
+            local playerContainer = Instance.new("Frame")
+            playerContainer.Name = "PlayerContainer"
+            playerContainer.Size = UDim2.new(1, 0, 0, 0)
+            playerContainer.AutomaticSize = Enum.AutomaticSize.Y
+            playerContainer.BackgroundTransparency = 1
+            playerContainer.LayoutOrder = #messageFrame:GetChildren()
+            playerContainer.Parent = messageFrame
+            
+            local playerLabel = Instance.new("TextLabel")
+            playerLabel.Name = "PlayerMessage"
+            playerLabel.Size = UDim2.new(1, 0, 0, 0)
+            playerLabel.AutomaticSize = Enum.AutomaticSize.Y
+            playerLabel.BackgroundColor3 = Color3.fromRGB(50, 80, 140)
+            playerLabel.BackgroundTransparency = 0.8
+            playerLabel.TextColor3 = Color3.fromRGB(220, 220, 255)
+            playerLabel.TextSize = 16
+            playerLabel.Font = Enum.Font.SourceSans
+            playerLabel.TextWrapped = true
+            playerLabel.TextXAlignment = Enum.TextXAlignment.Left
+            playerLabel.Text = "You: " .. message
+            playerLabel.Parent = playerContainer
+            
+            local playerPadding = Instance.new("UIPadding")
+            playerPadding.PaddingTop = UDim.new(0, 8)
+            playerPadding.PaddingBottom = UDim.new(0, 8)
+            playerPadding.PaddingLeft = UDim.new(0, 8)
+            playerPadding.PaddingRight = UDim.new(0, 8)
+            playerPadding.Parent = playerLabel
+            
+            local playerCorner = Instance.new("UICorner")
+            playerCorner.CornerRadius = UDim.new(0, 8)
+            playerCorner.Parent = playerLabel
+            
+            -- Send message to server
             ChatEvent:FireServer(message)
             inputBox.Text = ""
+            
+            -- Scroll to bottom
+            messageFrame.CanvasPosition = Vector2.new(0, messageFrame.CanvasSize.Y.Offset + 1000)
         end
     end
     
+    -- Hook up button click and Enter key
     sendButton.MouseButton1Click:Connect(sendMessage)
     
     inputBox.FocusLost:Connect(function(enterPressed)
@@ -219,14 +285,12 @@ local function createChatGui()
         mainFrame.Visible = false
     end)
     
-    print("CLIENT: Chat GUI created")
     return chatGui
 end
 
--- Create the chat GUI
 local chatGui = createChatGui()
 
--- Add a proximity indicator to show when you're close enough to interact
+-- Add a proximity indicator
 local function createProximityIndicator()
     local proximityGui = Instance.new("ScreenGui")
     proximityGui.Name = "ProximityGui"
@@ -256,45 +320,75 @@ local proximityGui, proximityIndicator = createProximityIndicator()
 
 -- Listen for messages from the server
 ChatEvent.OnClientEvent:Connect(function(response)
-    print("CLIENT: Received message from server:", response)
-    
     local mainFrame = chatGui.MainFrame
     local messageFrame = mainFrame.MessageFrame
     
     -- Make GUI visible when receiving a message
     mainFrame.Visible = true
     
-    -- Add the response message
-    local function addMessage(sender, message, color)
-        local messageLabel = Instance.new("TextLabel")
-        messageLabel.Name = "Message"
-        messageLabel.Size = UDim2.new(1, -16, 0, 0)
-        messageLabel.AutomaticSize = Enum.AutomaticSize.Y
-        messageLabel.BackgroundTransparency = 1
-        messageLabel.TextColor3 = color or Color3.fromRGB(255, 255, 255)
-        messageLabel.TextSize = 16
-        messageLabel.Font = Enum.Font.SourceSans
-        messageLabel.TextWrapped = true
-        messageLabel.TextXAlignment = Enum.TextXAlignment.Left
-        messageLabel.Text = sender .. ": " .. message
-        messageLabel.Parent = messageFrame
-        
-        -- Add padding between messages
-        local padding = Instance.new("UIPadding")
-        padding.PaddingTop = UDim.new(0, 8)
-        padding.PaddingBottom = UDim.new(0, 8)
-        padding.PaddingLeft = UDim.new(0, 8)
-        padding.PaddingRight = UDim.new(0, 8)
-        padding.Parent = messageLabel
-        
-        -- Scroll to bottom
-        messageFrame.CanvasPosition = Vector2.new(0, messageFrame.CanvasSize.Y.Offset)
-    end
+    -- Create message container for better organization
+    local messageContainer = Instance.new("Frame")
+    messageContainer.Name = "MessageContainer"
+    messageContainer.Size = UDim2.new(1, 0, 0, 0) -- Auto-height
+    messageContainer.AutomaticSize = Enum.AutomaticSize.Y
+    messageContainer.BackgroundTransparency = 1
+    messageContainer.LayoutOrder = #messageFrame:GetChildren() -- Ensure proper ordering
+    messageContainer.Parent = messageFrame
     
-    addMessage("Loader NPC", response, Color3.fromRGB(120, 255, 120))
+    -- Create the actual message
+    local messageLabel = Instance.new("TextLabel")
+    messageLabel.Name = "Message"
+    messageLabel.Size = UDim2.new(1, 0, 0, 0)
+    messageLabel.AutomaticSize = Enum.AutomaticSize.Y
+    messageLabel.BackgroundColor3 = Color3.fromRGB(50, 120, 50)
+    messageLabel.BackgroundTransparency = 0.8
+    messageLabel.TextColor3 = Color3.fromRGB(220, 255, 220)
+    messageLabel.TextSize = 16
+    messageLabel.Font = Enum.Font.SourceSans
+    messageLabel.TextWrapped = true
+    messageLabel.TextXAlignment = Enum.TextXAlignment.Left
+    messageLabel.Text = "Loader NPC: " .. response
+    messageLabel.Parent = messageContainer
+    
+    -- Add padding to message
+    local padding = Instance.new("UIPadding")
+    padding.PaddingTop = UDim.new(0, 8)
+    padding.PaddingBottom = UDim.new(0, 8)
+    padding.PaddingLeft = UDim.new(0, 8)
+    padding.PaddingRight = UDim.new(0, 8)
+    padding.Parent = messageLabel
+    
+    -- Add rounded corners to message
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = messageLabel
+    
+    -- Scroll to bottom
+    messageFrame.CanvasPosition = Vector2.new(0, messageFrame.CanvasSize.Y.Offset + 1000)
 end)
 
 -- Function to check if player is near the NPC
+local function findLoaderNPC()
+    local workspace = game:GetService("Workspace")
+    
+    if workspace:FindFirstChild("Roblox") then
+        return workspace.Roblox
+    end
+    
+    if workspace:FindFirstChild("Loader") then
+        return workspace.Loader
+    end
+    
+    local playerChar = game.Players.LocalPlayer.Character
+    for _, obj in pairs(workspace:GetChildren()) do
+        if obj:IsA("Model") and obj ~= playerChar and obj:FindFirstChild("Humanoid") then
+            return obj
+        end
+    end
+    
+    return nil
+end
+
 local function checkNearNPC()
     local character = player.Character
     if not character then return false end
@@ -302,45 +396,11 @@ local function checkNearNPC()
     local hrp = character:FindFirstChild("HumanoidRootPart")
     if not hrp then return false end
     
-    -- Replace the findLoaderNPC function in NPCChatClient.luau with this improved version
-    local function findLoaderNPC()
-        local workspace = game:GetService("Workspace")
-        
-        -- In Studio, the NPC is named "Loader"
-        -- But when playing, it becomes "Roblox"
-        if workspace:FindFirstChild("Roblox") then
-            print("CLIENT: Found NPC as Roblox model")
-            return workspace.Roblox
-        end
-        
-        -- Fallback to original name
-        if workspace:FindFirstChild("Loader") then
-            print("CLIENT: Found NPC as Loader model")
-            return workspace.Loader
-        end
-        
-        -- Last fallback - find any character model that isn't the player
-        local playerChar = game.Players.LocalPlayer.Character
-        for _, obj in pairs(workspace:GetChildren()) do
-            if obj:IsA("Model") and obj ~= playerChar and obj:FindFirstChild("Humanoid") then
-                print("CLIENT: Found fallback NPC:", obj.Name)
-                return obj
-            end
-        end
-        
-        print("CLIENT: Could not find NPC model")
-        return nil
-    end
-    
     local loaderNPC = findLoaderNPC()
-    if not loaderNPC then 
-        print("CLIENT: Could not find Loader NPC")
-        return false 
-    end
+    if not loaderNPC then return false end
     
     local npcPart = loaderNPC:FindFirstChild("HumanoidRootPart")
     if not npcPart then 
-        -- Try to find any BasePart to use as a reference
         for _, part in pairs(loaderNPC:GetDescendants()) do
             if part:IsA("BasePart") then
                 npcPart = part
@@ -348,13 +408,9 @@ local function checkNearNPC()
             end
         end
         
-        if not npcPart then
-            print("CLIENT: Loader NPC has no HumanoidRootPart or BaseParts")
-            return false
-        end
+        if not npcPart then return false end
     end
     
-    -- Check distance
     local distance = (npcPart.Position - hrp.Position).Magnitude
     local isNear = distance < 10
     
@@ -386,28 +442,19 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
         keyLabel.Text = "Key pressed: " .. input.KeyCode.Name
     end
     
-    -- E key handler - only if not processed by something else
+    -- E key handler
     if input.KeyCode == Enum.KeyCode.E and not gameProcessed then
-        print("CLIENT: E key pressed directly")
         local isNear, distance, loaderNPC = checkNearNPC()
         
         if isNear and loaderNPC then
-            print("CLIENT: Interacting with NPC at distance:", distance)
-            -- Show chat GUI and send initial message
             chatGui.MainFrame.Visible = true
             chatGui.MainFrame.InputFrame.InputBox:CaptureFocus()
-            
-            -- Send initial greeting
-            print("CLIENT: Sending initial Hello message")
             ChatEvent:FireServer("Hello")
-        else
-            print("CLIENT: Not near NPC, distance:", distance or "unknown")
         end
     end
     
     -- T key handler for chat toggle
     if input.KeyCode == Enum.KeyCode.T and not gameProcessed then
-        print("CLIENT: T key pressed to toggle chat")
         local mainFrame = chatGui.MainFrame
         mainFrame.Visible = not mainFrame.Visible
         
@@ -418,7 +465,6 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     
     -- P key for testing
     if input.KeyCode == Enum.KeyCode.P and not gameProcessed then
-        print("CLIENT: P key pressed for testing")
         ChatEvent:FireServer("Test message from P key")
     end
 end)
@@ -428,39 +474,26 @@ ContextActionService:BindAction(
     "NPCChat_Interact", 
     function(actionName, inputState, inputObject)
         if inputState == Enum.UserInputState.Begin then
-            print("CLIENT: E key pressed through ContextActionService")
-            
             local isNear, distance, loaderNPC = checkNearNPC()
             
             if isNear and loaderNPC then
-                print("CLIENT: Interacting with NPC at distance:", distance)
-                -- Show chat GUI and send initial message
                 chatGui.MainFrame.Visible = true
                 chatGui.MainFrame.InputFrame.InputBox:CaptureFocus()
-                
-                -- Send initial greeting
-                print("CLIENT: Sending initial Hello message through CAS")
                 ChatEvent:FireServer("Hello")
-                
-                return Enum.ContextActionResult.Sink  -- Consume the input
+                return Enum.ContextActionResult.Sink
             else
-                print("CLIENT: Not near NPC, distance:", distance or "unknown")
-                return Enum.ContextActionResult.Pass  -- Allow the input to continue
+                return Enum.ContextActionResult.Pass
             end
         end
         
         return Enum.ContextActionResult.Pass
     end,
-    false,  -- Don't create touch button
-    Enum.KeyCode.E  -- Bind to E key
+    false,
+    Enum.KeyCode.E
 )
 
--- Simple direct test to confirm communication works
--- Wait a moment to ensure everything is loaded
+-- Initial test message
 task.wait(2)
-print("CLIENT: Testing direct server communication...")
 ChatEvent:FireServer("Test message from client")
-print("CLIENT: NPC Chat Client initialized")
 
--- Return true to avoid "did not return exactly one value" error
 return true
