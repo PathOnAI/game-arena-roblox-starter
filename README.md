@@ -13,5 +13,9 @@ Tech stack:
 * AWS Fargate
 
 
-## Part 2: roblox-game-engine
+## Part 2: roblox-ai-backend
 https://github.com/TataKKKL/roblox-ai-backend-private
+
+
+## Part 3: roblox-game-engine
+https://github.com/PathOnAI/roblox-game-ai-backend/tree/main/ai-space-escape-roblox-main

@@ -2,12 +2,16 @@
 
 
 ## 03/04/2025, Tuesday
-### 2. 
+### 2. connect the backend to the roblox game
 ```
+## 1. change http service configuration
+
 src/client → StarterPlayerScripts
 src/server → ServerScriptService
 src/shared → ReplicatedStorage
 src/character → StartPlayer/StarterCharacterScripts
+
+## 2. change code in the roblox game
 ```
 
 
