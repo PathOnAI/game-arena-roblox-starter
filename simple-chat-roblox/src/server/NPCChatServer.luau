@@ -97,14 +97,21 @@ local function connectPlayerChatted(player)
 		local playerHRP = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 
 		if humanoid and hrp and playerHRP then
-			-- Make the NPC face the player when talking
-			humanoid:MoveTo(hrp.Position) -- Stop any movement
-			hrp.CFrame = CFrame.new(hrp.Position, Vector3.new(playerHRP.Position.X, hrp.Position.Y, playerHRP.Position.Z))
-			print("SERVER: Made NPC face player")
+			-- Check distance between NPC and player
+			local distance = (hrp.Position - playerHRP.Position).Magnitude
+			local maxChatDistance = 15 -- Maximum distance in studs for chat to work
+			
+			if distance <= maxChatDistance then
+				-- Make the NPC face the player when talking
+				humanoid:MoveTo(hrp.Position) -- Stop any movement
+				hrp.CFrame = CFrame.new(hrp.Position, Vector3.new(playerHRP.Position.X, hrp.Position.Y, playerHRP.Position.Z))
+				print("SERVER: Sending response to", player.Name, ":", response)
+				ChatEvent:FireClient(player, loaderNPC, response)
+				print("SERVER: Made NPC face player")
+			else
+				print("SERVER: Player", player.Name, "is too far from NPC (", distance, "studs). Max distance:", maxChatDistance)
+			end
 		end
-
-		print("SERVER: Sending response to", player.Name, ":", response)
-		ChatEvent:FireClient(player, loaderNPC, response)
 	end)
 end
 
