@@ -1,6 +1,98 @@
 # Log
 
 
+## 03/10/2025, Monday
+
+### 3. improvement of current game engine
+
+### 2. set up the github actions to setup the roblox game backend engine
+first set up the roblox game backend engine service on AWS ECS
+
+### 1. use AWS Route 53 for DNS management
+Once propagation is complete, your domain will be using AWS Route 53 for DNS management while remaining registered with GoDaddy.
+```
+Connecting GoDaddy Domain to AWS Route 53 DNS
+Here's a step-by-step guide to keep your domain registered with GoDaddy while using AWS Route 53 for DNS management:
+In AWS Route 53:
+
+Create a Hosted Zone:
+
+Log into your AWS console
+Go to Route 53 service
+Click "Hosted zones" → "Create hosted zone"
+Enter your domain name (e.g., example.com)
+Select "Public hosted zone" for type
+Click "Create"
+
+
+Note the Route 53 Nameservers:
+
+After creating the hosted zone, AWS will assign 4 nameservers
+These will be listed in the NS record in the hosted zone details
+They'll look like: ns-123.awsdns-12.com, ns-456.awsdns-34.net, etc.
+Copy these nameservers (you'll need them for GoDaddy)
+
+
+Set Up Your DNS Records in Route 53:
+
+Add any DNS records you need (A records, CNAME, MX, etc.)
+Click "Create record" and set up each record as needed
+
+
+
+In GoDaddy:
+
+Access DNS Management:
+
+Log into your GoDaddy account
+Go to "My Products"
+Find your domain and click "DNS"
+
+
+Update Nameservers:
+
+Look for "Nameservers" section
+Click "Change" or "Edit"
+Select "I'll use my own nameservers"
+Enter the 4 AWS Route 53 nameservers you copied earlier
+Save changes
+
+
+
+After Changes:
+
+DNS propagation can take 24-48 hours to complete worldwide
+During this time, some users might see the old DNS settings while others see the new ones
+You can check propagation using tools like whatsmydns.net
+
+Once propagation is complete, your domain will be using AWS Route 53 for DNS management while remaining registered with GoDaddy.
+```
+verification
+```
+(venv) danqingzhang@Danqings-MBP Exploration-2025 % nslookup -type=ns pathon.ai
+Server:         172.20.1.10
+Address:        172.20.1.10#53
+
+Non-authoritative answer:
+pathon.ai       nameserver = ns47.domaincontrol.com.
+pathon.ai       nameserver = ns48.domaincontrol.com.
+
+Authoritative answers can be found from:
+ns47.domaincontrol.com  internet address = 97.74.103.24
+ns47.domaincontrol.com  has AAAA address 2603:5:2172::18
+ns48.domaincontrol.com  internet address = 173.201.71.24
+ns48.domaincontrol.com  has AAAA address 2603:5:2272::18
+```
+
+TODO
+* https://github-issue-pulse.pathon.ai/
+  * nslookup github-issue-pulse.pathon.ai
+* github-issue-pulse-api.pathon.ai
+  * github-issue-fastapi-lb-729395614.us-east-1.elb.amazonaws.com
+  * nslookup github-issue-pulse-api.pathon.ai 
+
+
+
 ## 03/05/2025, Wednesday
 ### 1. simple chat roblox game in rojo project format
 * connect with ai backend of ai-space-escape-engine-main
