@@ -2,8 +2,9 @@ name: Deploy to Amazon ECS
 
 on:
   push:
-    branches: [ "main" ]  # Adjust branch name as needed
-  # Optional: Enable manual triggering
+    branches: [ "main" ] 
+    paths:
+      - 'fargate-backend/**' 
   workflow_dispatch:
 
 env:
