@@ -46,7 +46,7 @@ jobs:
         # Build a docker container for ARM64 and push it to ECR
         docker buildx build --platform linux/arm64 \
           --tag $ECR_REGISTRY/$ECR_REPOSITORY:latest \
-          --push .
+          --push ./fargate-backend
 
     - name: Force new deployment of ECS service
       run: |
