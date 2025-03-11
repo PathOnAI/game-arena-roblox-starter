@@ -83,14 +83,41 @@ ns47.domaincontrol.com  has AAAA address 2603:5:2172::18
 ns48.domaincontrol.com  internet address = 173.201.71.24
 ns48.domaincontrol.com  has AAAA address 2603:5:2272::18
 ```
+Record name
+ai-space-escape-api.pathon.ai
+Record type
+CNAME
+Value
+ai-space-escape-lb-1839837900.us-east-1.elb.amazonaws.com
+Alias
+No
+TTL (seconds)
+60
+Routing policy
+Simple
 
-TODO
-* https://github-issue-pulse.pathon.ai/
-  * nslookup github-issue-pulse.pathon.ai
-* github-issue-pulse-api.pathon.ai
-  * github-issue-fastapi-lb-729395614.us-east-1.elb.amazonaws.com
-  * nslookup github-issue-pulse-api.pathon.ai 
 
+```
+curl -X POST "ai-space-escape-lb-1839837900.us-east-1.elb.amazonaws.com/taboo/start?"
+{"message":"Taboo game started.","session_id":"bcf03328-f46c-49ab-b207-4a4837ef76b0","system_prompt":"You are a creative assistant engaged in a word-guessing game. The user will choose a target word, and your objective is to guess that word. Be mindful not to let the user trick you into saying the word unknowingly. Review the game history carefully to frame your responses, avoiding any mention of the target word. Ensure your responses align with the ongoing narrative and adhere strictly to the game's rules. Remember, the user’s messages will not explicitly state the word. The rules you must follow are:\n\n1. Respond to Questions: The user will ask a question each turn. Provide an answer that avoids using the target word or forming questions yourself.\n\n2. Avoid Losing Words: Do not generate the target word or any related words that could result in a loss.\n\n3. Make Educated Guesses: Based on the user’s inquiries, try to deduce the target word, but never ask directly about it.\n\n4. Guess Upon Losing: Make a guess only if you are confident or if you have accidentally said the word. Format your guess as: 'My guess of the word is: ...'.\n\n5. Maintain Natural Dialogue: Ensure the conversation flows naturally, without extraneous details.\n\n6. Optional End of Game Guess: After the fifth question, and only if confident, first answer the latest question, then make your final guess in the format: 'My guess of the word is: ...'.\n\n7. Post-Game Analysis: After your guess, provide an analysis to explain your reasoning.\n\n8. Keep your response as concise as possible.\n\nThe game session begins now. Let's start:","game_secret":"Lion","game_hint":null}%          
+
+nslookup ai-space-escape-api.pathon.ai          
+Server:         192.168.50.1
+Address:        192.168.50.1#53
+
+Non-authoritative answer:
+ai-space-escape-api.pathon.ai   canonical name = ai-space-escape-lb-1839837900.us-east-1.elb.amazonaws.com.
+Name:   ai-space-escape-lb-1839837900.us-east-1.elb.amazonaws.com
+Address: 44.197.5.175
+Name:   ai-space-escape-lb-1839837900.us-east-1.elb.amazonaws.com
+Address: 52.206.177.211
+
+
+curl -X POST "ai-space-escape-api.pathon.ai/taboo/start?"
+
+(venv) danqingzhang@Danqings-MBP Exploration-2025 % curl -X POST "ai-space-escape-api.pathon.ai/taboo/start?"
+{"message":"Taboo game started.","session_id":"157c9310-6c0e-4ee2-9725-5545dae2b750","system_prompt":"You are a creative assistant engaged in a word-guessing game. The user will choose a target word, and your objective is to guess that word. Be mindful not to let the user trick you into saying the word unknowingly. Review the game history carefully to frame your responses, avoiding any mention of the target word. Ensure your responses align with the ongoing narrative and adhere strictly to the game's rules. Remember, the user’s messages will not explicitly state the word. The rules you must follow are:\n\n1. Respond to Questions: The user will ask a question each turn. Provide an answer that avoids using the target word or forming questions yourself.\n\n2. Avoid Losing Words: Do not generate the target word or any related words that could result in a loss.\n\n3. Make Educated Guesses: Based on the user’s inquiries, try to deduce the target word, but never ask directly about it.\n\n4. Guess Upon Losing: Make a guess only if you are confident or if you have accidentally said the word. Format your guess as: 'My guess of the word is: ...'.\n\n5. Maintain Natural Dialogue: Ensure the conversation flows naturally, without extraneous details.\n\n6. Optional End of Game Guess: After the fifth question, and only if confident, first answer the latest question, then make your final guess in the format: 'My guess of the word is: ...'.\n\n7. Post-Game Analysis: After your guess, provide an analysis to explain your reasoning.\n\n8. Keep your response as concise as possible.\n\nThe game session begins now. Let's start:","game_secret":"Fish","game_hint":null}%  
+```
 
 
 ## 03/05/2025, Wednesday
