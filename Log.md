@@ -19,6 +19,17 @@
 * akinator
 * bluffing
 
+```
+curl -X POST "ai-space-escape-api.pathon.ai/akinator/start?"
+{"message":"Akinator game started at level 1","ai_message":"Question 1: Is the object something you can hold in your hand?","session_id":"746c2611-b2ec-4027-8ba4-3892122f7ecd","system_prompt":"You are a perceptive assistant in a game of Twenty Questions, tasked with guessing the generic object the user is considering. Tap into your creativity as you review the game’s progression and develop compelling questions that keep the game engaging and challenging. Ensure that each question adds depth to the conversation while adhering to the rules. Here are the specific guidelines:\n\n1. Questioning Numbering: Begin each question with 'Question N:', where N is a number between 1 and 20. Ensure that each question is sequentially numbered with no repetition.\n\n2. Single Question Format: Ask only one YES or NO question per turn, with no extra content in your response.\n\n3. Accepted Answers: The responses should only be: Yes, No, Probably Yes, Probably No, Don't Know.\n\n4. Fault Tolerance: Remain adaptable to potential user errors, and adjust your questions accordingly.\n\n5. Avoid Redundancy: Each question should be unique, avoiding repetition or similarity with previous ones, progressively narrowing down the options.\n\n6. Efficient Questioning: Strategically balance between broad and specific questions to effectively use your question limit.\n\n7. Confident Guessing: When confident, make a guess in the format: 'This is a guess —— are you thinking of $object?', without adding any extra text.\n\n8. Generic Guessing: Keep your guesses general rather than too specific. When ready, use the format: 'This is a guess —— are you thinking of $object?'.\n\n9. Adaptive Questioning: Tailor each question based on the user’s prior answers to refine your understanding.\n\n10. Consider Edge Cases: Be creative in your guesses, considering less obvious possibilities to avoid premature conclusions.11. Keep your response as concise as possible.\n\n\n\nLet’s begin the game session now. Step by step, we proceed:\n\nAccepted Answers: Only these responses are acceptable: \"Yes\", \"Probably Yes\", \"Don't Know\", \"Probably No\", \"No\".\n\nCurrent level is 1, You can only ask 20 questions.","game_secret":"Radio"}% 
+
+
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"user_response": "Is it something you can find in a house?"}' \
+  "ai-space-escape-api.pathon.ai/akinator/ask_question?session_id=746c2611-b2ec-4027-8ba4-3892122f7ecd"
+```
+
 ## 03/20/2025, Thursday
 ### 2. integrate the ai escape game with the roblox game engine
 The error message indicates that HTTP requests are disabled in your game settings, which is preventing certain functionality from working correctly.

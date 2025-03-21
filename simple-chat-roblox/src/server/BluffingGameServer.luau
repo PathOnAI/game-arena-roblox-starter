@@ -47,9 +47,9 @@ local function handleStartGame()
     end
 end
 
--- Handle move requests
-local function handleMove(sessionId, move)
-    print("SERVER: Attempting to make move in Bluffing game. Session:", sessionId, "Move:", move)
+-- Handle ask question requests
+local function handleAskQuestion(sessionId, question)
+    print("SERVER: Attempting to send question to Bluffing game. Session:", sessionId, "Question:", question)
     
     -- Validate parameters
     if type(sessionId) ~= "string" then
@@ -58,18 +58,18 @@ local function handleMove(sessionId, move)
         }
     end
     
-    if type(move) ~= "string" then
+    if type(question) ~= "string" then
         return {
-            error = "Invalid move format"
+            error = "Invalid question format"
         }
     end
     
     local success, response = pcall(function()
         local data = HttpService:JSONEncode({
-            user_move = move
+            user_response = question
         })
         local result = HttpService:PostAsync(
-            API_BASE_URL .. "/move?session_id=" .. sessionId,
+            API_BASE_URL .. "/ask_question?session_id=" .. sessionId,
             data
         )
         print("SERVER: Raw API response:", result)
@@ -77,10 +77,10 @@ local function handleMove(sessionId, move)
     end)
 
     if success then
-        print("SERVER: Move processed successfully:", HttpService:JSONEncode(response))
+        print("SERVER: Question processed successfully:", HttpService:JSONEncode(response))
         return response
     else
-        print("SERVER: Error processing move:", response)
+        print("SERVER: Error processing question:", response)
         return {
             error = handleHttpError(response)
         }
@@ -89,9 +89,9 @@ end
 
 -- Connect RemoteFunction handlers
 StartGameEvent.OnServerInvoke = handleStartGame
--- Swap parameters for MakeMoveEvent handler
-MakeMoveEvent.OnServerInvoke = function(player, move, sessionId)
-    return handleMove(sessionId, move)
+-- Fixed parameter order for MakeMoveEvent handler to match TabooGameServer
+MakeMoveEvent.OnServerInvoke = function(player, question, sessionId)
+    return handleAskQuestion(sessionId, question)
 end
 
 print("SERVER: BluffingGameServer initialization complete")

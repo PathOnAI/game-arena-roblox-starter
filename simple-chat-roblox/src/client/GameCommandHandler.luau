@@ -56,13 +56,8 @@ local function handleCommand(message, fromPlayer)
     
     -- If a game is active, pass the message to it
     if activeGame and activeGame.isGameActive() then
-        if activeGame == TabooGame then
-            return activeGame.askQuestion(message)
-        elseif activeGame == AkinatorGame then
-            return activeGame.answerQuestion(message)
-        elseif activeGame == BluffingGame then
-            return activeGame.makeMove(message)
-        end
+        -- Use askQuestion for all games consistently
+        return activeGame.askQuestion(message)
     end
     
     return false, nil
