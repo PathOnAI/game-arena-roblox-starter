@@ -1,6 +1,90 @@
 # Log
 
 
+## 03/21/2025, Friday
+### 5. publish to robox as ai_chat roblox game
+* use rojo project to code the roblox game
+* then save the whole roblox project as a rbxl file
+* and then publish the game to roblox
+
+### 4. chat UI
+* when to start chat
+* some prompts to tell user about the command
+
+### 3. take action at the end of the game
+
+### 2. configure the normal chat
+
+### 1. configure the other two games
+
+## 03/20/2025, Thursday
+### 2. integrate the ai escape game with the roblox game engine
+The error message indicates that HTTP requests are disabled in your game settings, which is preventing certain functionality from working correctly.
+To fix this issue, you need to:
+
+Open your Roblox game in Roblox Studio
+Go to Game Settings
+Navigate to the Security tab
+Enable HTTP Requests
+
+```
+curl -X POST "ai-space-escape-api.pathon.ai/taboo/start?"
+{"message":"Taboo game started.","session_id":"9d3ee83d-5cbc-4953-8519-9c353eab1a59","system_prompt":"You are a creative assistant engaged in a word-guessing game. The user will choose a target word, and your objective is to guess that word. Be mindful not to let the user trick you into saying the word unknowingly. Review the game history carefully to frame your responses, avoiding any mention of the target word. Ensure your responses align with the ongoing narrative and adhere strictly to the game's rules. Remember, the user’s messages will not explicitly state the word. The rules you must follow are:\n\n1. Respond to Questions: The user will ask a question each turn. Provide an answer that avoids using the target word or forming questions yourself.\n\n2. Avoid Losing Words: Do not generate the target word or any related words that could result in a loss.\n\n3. Make Educated Guesses: Based on the user’s inquiries, try to deduce the target word, but never ask directly about it.\n\n4. Guess Upon Losing: Make a guess only if you are confident or if you have accidentally said the word. Format your guess as: 'My guess of the word is: ...'.\n\n5. Maintain Natural Dialogue: Ensure the conversation flows naturally, without extraneous details.\n\n6. Optional End of Game Guess: After the fifth question, and only if confident, first answer the latest question, then make your final guess in the format: 'My guess of the word is: ...'.\n\n7. Post-Game Analysis: After your guess, provide an analysis to explain your reasoning.\n\n8. Keep your response as concise as possible.\n\nThe game session begins now. Let's start:","game_secret":"Lion","game_hint":null}%
+```
+
+```
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"user_response": "Is it something you can find in a house?"}' \
+  "ai-space-escape-api.pathon.ai/taboo/ask_question?session_id=9d3ee83d-5cbc-4953-8519-9c353eab1a59"
+
+{"ai_message":"Yes, it's commonly found in many households. This item serves a practical purpose and is often used on a daily basis.","round":1,"game_over":false,"game_status":null,"end_reason":null}%
+```
+
+```
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"user_response": "Is it a chair?"}' \
+  "ai-space-escape-api.pathon.ai/taboo/ask_question?session_id=9d3ee83d-5cbc-4953-8519-9c353eab1a59"
+
+{"ai_message":"While chairs are indeed common household items, the object I'm thinking of serves a different function. It's not primarily used for seating. This item is more often associated with utility rather than comfort.","round":2,"game_over":false,"game_status":null,"end_reason":null}%
+```
+
+```
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"user_response": "Is it a table?"}' \
+  "ai-space-escape-api.pathon.ai/taboo/ask_question?session_id=9d3ee83d-5cbc-4953-8519-9c353eab1a59"
+  {"ai_message":"No, it's not a table. The item in question is generally smaller and more portable than a table. It's an object that people often interact with directly, rather than placing things on its surface.","round":3,"game_over":false,"game_status":null,"end_reason":null}%
+```
+
+```
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"user_response": "Give me more hint"}' \
+  "ai-space-escape-api.pathon.ai/taboo/ask_question?session_id=9d3ee83d-5cbc-4953-8519-9c353eab1a59"
+{"ai_message":"Certainly. This item is typically handheld and is used for various tasks around the house. It often requires some form of power to operate, whether that's electricity or batteries. People use it for maintenance, repairs, or everyday household chores.","round":4,"game_over":false,"game_status":null,"end_reason":null}%
+```
+
+```
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"user_response": "Is it a lamp"}' \
+  "ai-space-escape-api.pathon.ai/taboo/ask_question?session_id=9d3ee83d-5cbc-4953-8519-9c353eab1a59"
+{"ai_message":"No, it's not a lamp. While lamps do provide light, the item I'm thinking of serves a different purpose. It's not primarily used for illumination. This object is more often associated with active use rather than passive functionality like a lamp. It's something you would typically hold and manipulate with your hands to perform a specific task.","round":5,"game_over":true,"game_status":"PLAYER_LOSE","end_reason":"MAX_ROUND_REACHED"}%   
+```
+
+```
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{"user_response": "I do not know"}' \
+  "ai-space-escape-api.pathon.ai/taboo/ask_question?session_id=9d3ee83d-5cbc-4953-8519-9c353eab1a59"
+{"message":"Game over.","status":"PLAYER_LOSE"}% 
+```
+
+### 1. press E to start the chat interface
+
+
 ## 03/10/2025, Monday
 
 ### 3. improvement of current game engine

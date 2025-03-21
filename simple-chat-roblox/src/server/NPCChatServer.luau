@@ -4,9 +4,26 @@ local Players = game:GetService("Players")
 
 print("SERVER: NPCChatServer script starting")
 
+-- Command prefixes to ignore
+local COMMAND_PREFIXES = {
+	"/taboo",
+	"/tabooreset",
+	"/taboohelp"
+}
+
 -- Variables
 local ChatEvent
 local loaderNPC
+
+-- Function to check if a message is a command
+local function isCommand(message)
+	for _, prefix in ipairs(COMMAND_PREFIXES) do
+		if message:lower():sub(1, #prefix) == prefix:lower() then
+			return true
+		end
+	end
+	return false
+end
 
 -- Create or get the ChatEvent RemoteEvent
 local function getChatEvent()
@@ -88,6 +105,13 @@ end
 local function connectPlayerChatted(player)
 	player.Chatted:Connect(function(message)
 		print("SERVER: Received message from", player.Name, ":", message)
+		
+		-- Ignore command messages
+		if isCommand(message) then
+			print("SERVER: Ignoring command message:", message)
+			return
+		end
+		
 		local npcName = loaderNPC.Name
 		local response = "Hello, " .. player.Name .. "! I'm " .. npcName .. ". You said: " .. message
 
@@ -165,5 +189,56 @@ print("SERVER: NPCChatServer fully initialized")
 
 -- Optional: Uncomment to test the message system on start
 -- testMessageSystem()
+
+ChatEvent.OnServerEvent:Connect(function(player, input)
+	print("SERVER: Received chat event from player:", player.Name)
+	print("SERVER: Input received:", input)
+	
+	if input == "GAME_WIN" then
+		-- Make NPC jump
+		if loaderNPC then
+			local humanoid = loaderNPC:FindFirstChild("Humanoid")
+			if humanoid then
+				humanoid.Jump = true
+				ChatEvent:FireClient(player, {name = loaderNPC.Name}, "Congratulations! You won!")
+			end
+		end
+		return
+	elseif input == "GAME_LOSE" then
+		-- Make NPC walk backwards
+		if loaderNPC then
+			local humanoid = loaderNPC:FindFirstChild("Humanoid")
+			local hrp = loaderNPC:FindFirstChild("HumanoidRootPart")
+			if humanoid and hrp then
+				local playerChar = player.Character
+				if playerChar and playerChar:FindFirstChild("HumanoidRootPart") then
+					local direction = (hrp.Position - playerChar.HumanoidRootPart.Position).Unit
+					local targetPos = hrp.Position + direction * 15
+					humanoid:MoveTo(targetPos)
+					ChatEvent:FireClient(player, {name = loaderNPC.Name}, "Oh, you lost! Better luck next time!")
+				end
+			end
+		end
+		return
+	end
+	
+	-- Handle regular NPC chat
+	if not input then
+		print("SERVER: No NPC provided")
+		return
+	end
+	
+	if not input:IsA("Model") then
+		print("SERVER: NPC is not a Model, it's a", input.ClassName)
+		return
+	end
+	
+	print("SERVER: Sending response back to player")
+	-- Send a response back to the player
+	ChatEvent:FireClient(player, {
+		name = input.Name,
+	}, "Hello! How can I help you today?")
+	print("SERVER: Response sent to player")
+end)
 
 return true
