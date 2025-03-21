@@ -1,9 +1,18 @@
 # Log
 
-## 03/20/2025, Thursday
+
+## 03/21/2025, Friday
+### 4. chat UI
+* when to start chat
+* some prompts to tell user about the command
+
 ### 3. take action at the end of the game
 
+### 2. configure the normal chat
 
+### 1. configure the other two games
+
+## 03/20/2025, Thursday
 ### 2. integrate the ai escape game with the roblox game engine
 The error message indicates that HTTP requests are disabled in your game settings, which is preventing certain functionality from working correctly.
 To fix this issue, you need to:
