@@ -2,7 +2,7 @@
 
 
 ## 03/21/2025, Friday
-### 5. publish to robox as ai_chat roblox game
+### 5. publish to robox as ai_chat roblox game [done]
 * use rojo project to code the roblox game
 * then save the whole roblox project as a rbxl file
 * and then publish the game to roblox
@@ -11,11 +11,11 @@
 * when to start chat
 * some prompts to tell user about the command
 
-### 3. take action at the end of the game
+### 3. configure the normal chat
 
-### 2. configure the normal chat
+### 2. take action at the end of the game [done]
 
-### 1. configure the other two games
+### 1. configure the other two games [done]
 * akinator
 * bluffing
 
