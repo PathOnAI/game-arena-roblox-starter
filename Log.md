@@ -16,6 +16,8 @@
 ### 2. configure the normal chat
 
 ### 1. configure the other two games
+* akinator
+* bluffing
 
 ## 03/20/2025, Thursday
 ### 2. integrate the ai escape game with the roblox game engine
