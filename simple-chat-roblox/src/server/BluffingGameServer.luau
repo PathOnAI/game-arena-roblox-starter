@@ -48,7 +48,7 @@ local function handleStartGame()
 end
 
 -- Handle move requests
-local function handleMove(move, sessionId)
+local function handleMove(sessionId, move)
     print("SERVER: Attempting to make move in Bluffing game. Session:", sessionId, "Move:", move)
     
     -- Validate parameters
@@ -89,10 +89,11 @@ end
 
 -- Connect RemoteFunction handlers
 StartGameEvent.OnServerInvoke = handleStartGame
+-- Swap parameters for MakeMoveEvent handler
 MakeMoveEvent.OnServerInvoke = function(player, move, sessionId)
-    return handleMove(move, sessionId)
+    return handleMove(sessionId, move)
 end
 
 print("SERVER: BluffingGameServer initialization complete")
 
-return true 
+return true

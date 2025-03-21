@@ -3,8 +3,8 @@ local Players = game:GetService("Players")
 
 -- Load game modules
 local TabooGame = require(script.Parent.TabooGameClient)
--- local AkinatorGame = require(script.Parent.AkinatorGameClient)
--- local BluffingGame = require(script.Parent.BluffingGameClient)
+local AkinatorGame = require(script.Parent.AkinatorGameClient)
+local BluffingGame = require(script.Parent.BluffingGameClient)
 
 print("GameCommandHandler: Module loaded")
 
@@ -40,12 +40,28 @@ local function handleCommand(message, fromPlayer)
         end
         activeGame = TabooGame
         return activeGame.startGame()
+    elseif command == COMMANDS.AKINATOR then
+        if activeGame then
+            return false, "Please exit the current game first using /exit"
+        end
+        activeGame = AkinatorGame
+        return activeGame.startGame()
+    elseif command == COMMANDS.BLUFFING then
+        if activeGame then
+            return false, "Please exit the current game first using /exit"
+        end
+        activeGame = BluffingGame
+        return activeGame.startGame()
     end
     
     -- If a game is active, pass the message to it
     if activeGame and activeGame.isGameActive() then
         if activeGame == TabooGame then
             return activeGame.askQuestion(message)
+        elseif activeGame == AkinatorGame then
+            return activeGame.answerQuestion(message)
+        elseif activeGame == BluffingGame then
+            return activeGame.makeMove(message)
         end
     end
     
@@ -92,4 +108,4 @@ end
 -- Initialize the command handler
 init()
 
-return true 
+return true

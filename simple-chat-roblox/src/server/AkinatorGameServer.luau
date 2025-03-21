@@ -18,27 +18,49 @@ local AskQuestionEvent = Instance.new("RemoteFunction")
 AskQuestionEvent.Name = "AkinatorAskQuestion"
 AskQuestionEvent.Parent = AkinatorRemotes
 
+-- Function to handle HTTP errors
+local function handleHttpError(err)
+    if typeof(err) == "string" and err:match("Http requests are not enabled") then
+        return "HTTP Requests are not enabled. Please enable them in Game Settings -> Security."
+    end
+    return tostring(err)
+end
+
 -- Handle start game requests
 local function handleStartGame()
+    print("SERVER: Attempting to start new Akinator game...")
+    
     local success, response = pcall(function()
         local result = HttpService:PostAsync(API_BASE_URL .. "/start", "")
+        print("SERVER: Raw API response:", result)
         return HttpService:JSONDecode(result)
     end)
 
     if success then
+        print("SERVER: Akinator game started successfully:", HttpService:JSONEncode(response))
         return response
     else
+        print("SERVER: Error starting Akinator game:", response)
         return {
-            error = tostring(response)
+            error = handleHttpError(response)
         }
     end
 end
 
 -- Handle answer requests
-local function handleAnswer(answer, sessionId)
-    if type(sessionId) ~= "string" or type(answer) ~= "string" then
+local function handleAnswer(sessionId, answer)
+    print("SERVER: Attempting to send answer to Akinator game. Session:", sessionId, "Answer:", answer)
+    
+    -- Validate parameters
+    if type(sessionId) ~= "string" then
         return {
-            error = "Invalid parameters"
+            error = "Invalid session ID"
+        }
+    end
+    
+    if type(answer) ~= "string" then
+        return {
+            error = "Invalid answer format"
         }
     end
     
@@ -50,21 +72,28 @@ local function handleAnswer(answer, sessionId)
             API_BASE_URL .. "/answer?session_id=" .. sessionId,
             data
         )
+        print("SERVER: Raw API response:", result)
         return HttpService:JSONDecode(result)
     end)
 
     if success then
+        print("SERVER: Answer processed successfully:", HttpService:JSONEncode(response))
         return response
     else
+        print("SERVER: Error processing answer:", response)
         return {
-            error = tostring(response)
+            error = handleHttpError(response)
         }
     end
 end
 
+-- Connect RemoteFunction handlers
 StartGameEvent.OnServerInvoke = handleStartGame
-AskQuestionEvent.OnServerInvoke = handleAnswer
+-- Swap parameters for AskQuestionEvent handler
+AskQuestionEvent.OnServerInvoke = function(player, answer, sessionId)
+    return handleAnswer(sessionId, answer)
+end
 
 print("SERVER: AkinatorGameServer initialization complete")
 
-return true 
+return true

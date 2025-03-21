@@ -27,6 +27,44 @@ local function isGameCommand(message)
 	return false
 end
 
+-- Process game commands directly
+local function processGameCommand(player, message)
+    local command = message:lower()
+    
+    -- Check which game to start
+    if command:sub(1, 7) == "/taboo " then
+        print("SERVER: Processing Taboo command")
+        -- We don't need to do anything here as client will handle it
+        return true
+    elseif command:sub(1, 10) == "/akinator " then
+        print("SERVER: Processing Akinator command")
+        -- We don't need to do anything here as client will handle it
+        return true
+    elseif command:sub(1, 10) == "/bluffing " then
+        print("SERVER: Processing Bluffing command")
+        -- We don't need to do anything here as client will handle it
+        return true
+    elseif command == "/taboo" then
+        print("SERVER: Starting Taboo game")
+        -- We don't need to do anything here as client will handle it
+        return true
+    elseif command == "/akinator" then
+        print("SERVER: Starting Akinator game")
+        -- We don't need to do anything here as client will handle it
+        return true
+    elseif command == "/bluffing" then
+        print("SERVER: Starting Bluffing game")
+        -- We don't need to do anything here as client will handle it
+        return true
+    elseif command == "/exit" then
+        print("SERVER: Exiting active game")
+        -- We don't need to do anything here as client will handle it
+        return true
+    end
+    
+    return false
+end
+
 -- Create or get the ChatEvent RemoteEvent
 local function getChatEvent()
 	local chatEvent = ReplicatedStorage:FindFirstChild("ChatEvent")
@@ -106,6 +144,7 @@ local function connectPlayerChatted(player)
 		
 		-- Let game commands pass through without NPC response
 		if isGameCommand(message) then
+            processGameCommand(player, message)
 			return
 		end
 		
@@ -144,8 +183,44 @@ local function testMessageSystem()
 	end
 end
 
+-- Function to verify that all game remotes exist
+local function verifyGameRemotes()
+    -- Check Taboo remotes
+    local tabooRemotes = ReplicatedStorage:FindFirstChild("TabooRemotes")
+    if not tabooRemotes or
+       not tabooRemotes:FindFirstChild("TabooStartGame") or
+       not tabooRemotes:FindFirstChild("TabooAskQuestion") then
+        warn("SERVER: TabooRemotes are missing or incomplete!")
+    else
+        print("SERVER: TabooRemotes verified")
+    end
+    
+    -- Check Akinator remotes
+    local akinatorRemotes = ReplicatedStorage:FindFirstChild("AkinatorRemotes")
+    if not akinatorRemotes or
+       not akinatorRemotes:FindFirstChild("AkinatorStartGame") or
+       not akinatorRemotes:FindFirstChild("AkinatorAskQuestion") then
+        warn("SERVER: AkinatorRemotes are missing or incomplete!")
+    else
+        print("SERVER: AkinatorRemotes verified")
+    end
+    
+    -- Check Bluffing remotes
+    local bluffingRemotes = ReplicatedStorage:FindFirstChild("BluffingRemotes")
+    if not bluffingRemotes or
+       not bluffingRemotes:FindFirstChild("BluffingStartGame") or
+       not bluffingRemotes:FindFirstChild("BluffingMakeMove") then
+        warn("SERVER: BluffingRemotes are missing or incomplete!")
+    else
+        print("SERVER: BluffingRemotes verified")
+    end
+end
+
 -- INITIALIZATION
 ChatEvent = getChatEvent()
+
+-- Verify all game remotes exist
+verifyGameRemotes()
 
 -- Find the loader NPC
 local maxAttempts = 10

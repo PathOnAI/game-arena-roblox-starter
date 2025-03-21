@@ -30,51 +30,80 @@ local TabooGameServer = safeRequire("TabooGameServer")
 local AkinatorGameServer = safeRequire("AkinatorGameServer")
 local BluffingGameServer = safeRequire("BluffingGameServer")
 
--- Create a folder in ReplicatedStorage for all game remotes
+-- Check if the game servers' RemoteFunctions already exist in ReplicatedStorage
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local GameRemotes = Instance.new("Folder")
-GameRemotes.Name = "GameRemotes"
-GameRemotes.Parent = ReplicatedStorage
 
--- Create RemoteEvents for each game
-local function createRemoteFunction(name)
-    local remote = Instance.new("RemoteFunction")
-    remote.Name = name
-    remote.Parent = GameRemotes
-    return remote
+-- Function to check if a remote function already exists
+local function checkRemoteExists(parentFolder, remoteName)
+    if not parentFolder then return false end
+    return parentFolder:FindFirstChild(remoteName) ~= nil
 end
 
--- Set up remote functions for each game
-local TabooRemotes = Instance.new("Folder")
-TabooRemotes.Name = "TabooRemotes"
-TabooRemotes.Parent = GameRemotes
+-- Only create game remotes if they don't already exist from the game servers
 
-local AkinatorRemotes = Instance.new("Folder")
-AkinatorRemotes.Name = "AkinatorRemotes"
-AkinatorRemotes.Parent = GameRemotes
+-- Check for existing Taboo remotes
+local existingTabooRemotes = ReplicatedStorage:FindFirstChild("TabooRemotes")
+if not existingTabooRemotes then
+    print("SERVER: Creating TabooRemotes as they don't exist")
+    local TabooRemotes = Instance.new("Folder")
+    TabooRemotes.Name = "TabooRemotes"
+    TabooRemotes.Parent = ReplicatedStorage
+    
+    local TabooStartGame = Instance.new("RemoteFunction")
+    TabooStartGame.Name = "TabooStartGame"
+    TabooStartGame.Parent = TabooRemotes
+    
+    local TabooAskQuestion = Instance.new("RemoteFunction")
+    TabooAskQuestion.Name = "TabooAskQuestion"
+    TabooAskQuestion.Parent = TabooRemotes
+    
+    print("SERVER: TabooRemotes created successfully")
+else
+    print("SERVER: TabooRemotes already exist in ReplicatedStorage")
+end
 
-local BluffingRemotes = Instance.new("Folder")
-BluffingRemotes.Name = "BluffingRemotes"
-BluffingRemotes.Parent = GameRemotes
+-- Check for existing Akinator remotes
+local existingAkinatorRemotes = ReplicatedStorage:FindFirstChild("AkinatorRemotes")
+if not existingAkinatorRemotes then
+    print("SERVER: Creating AkinatorRemotes as they don't exist")
+    local AkinatorRemotes = Instance.new("Folder")
+    AkinatorRemotes.Name = "AkinatorRemotes"
+    AkinatorRemotes.Parent = ReplicatedStorage
+    
+    local AkinatorStartGame = Instance.new("RemoteFunction")
+    AkinatorStartGame.Name = "AkinatorStartGame"
+    AkinatorStartGame.Parent = AkinatorRemotes
+    
+    -- Make sure the name matches what's used in AkinatorGameServer.luau
+    local AkinatorAskQuestion = Instance.new("RemoteFunction")
+    AkinatorAskQuestion.Name = "AkinatorAskQuestion"
+    AkinatorAskQuestion.Parent = AkinatorRemotes
+    
+    print("SERVER: AkinatorRemotes created successfully")
+else
+    print("SERVER: AkinatorRemotes already exist in ReplicatedStorage")
+end
 
--- Create specific remotes for each game
--- Taboo Game Remotes
-local TabooStartGame = createRemoteFunction("TabooStartGame")
-local TabooAskQuestion = createRemoteFunction("TabooAskQuestion")
-TabooStartGame.Parent = TabooRemotes
-TabooAskQuestion.Parent = TabooRemotes
-
--- Akinator Game Remotes
-local AkinatorStartGame = createRemoteFunction("AkinatorStartGame")
-local AkinatorAnswer = createRemoteFunction("AkinatorAnswer")
-AkinatorStartGame.Parent = AkinatorRemotes
-AkinatorAnswer.Parent = AkinatorRemotes
-
--- Bluffing Game Remotes
-local BluffingStartGame = createRemoteFunction("BluffingStartGame")
-local BluffingMakeMove = createRemoteFunction("BluffingMakeMove")
-BluffingStartGame.Parent = BluffingRemotes
-BluffingMakeMove.Parent = BluffingRemotes
+-- Check for existing Bluffing remotes
+local existingBluffingRemotes = ReplicatedStorage:FindFirstChild("BluffingRemotes")
+if not existingBluffingRemotes then
+    print("SERVER: Creating BluffingRemotes as they don't exist")
+    local BluffingRemotes = Instance.new("Folder")
+    BluffingRemotes.Name = "BluffingRemotes"
+    BluffingRemotes.Parent = ReplicatedStorage
+    
+    local BluffingStartGame = Instance.new("RemoteFunction")
+    BluffingStartGame.Name = "BluffingStartGame"
+    BluffingStartGame.Parent = BluffingRemotes
+    
+    local BluffingMakeMove = Instance.new("RemoteFunction")
+    BluffingMakeMove.Name = "BluffingMakeMove"
+    BluffingMakeMove.Parent = BluffingRemotes
+    
+    print("SERVER: BluffingRemotes created successfully")
+else
+    print("SERVER: BluffingRemotes already exist in ReplicatedStorage")
+end
 
 -- Check if all required servers loaded successfully
 if not NPCChatServer then
