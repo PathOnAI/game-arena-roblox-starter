@@ -2,6 +2,11 @@
 
 
 ## 03/21/2025, Friday
+### 5. publish to robox as ai_chat roblox game
+* use rojo project to code the roblox game
+* then save the whole roblox project as a rbxl file
+* and then publish the game to roblox
+
 ### 4. chat UI
 * when to start chat
 * some prompts to tell user about the command
