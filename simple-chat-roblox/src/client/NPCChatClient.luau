@@ -39,7 +39,7 @@ local lastChatTime = 0
 
 -- Load TabooGame module
 local TabooGame = require(script.Parent.TabooGameClient)
-local TabooCommandHandler = require(script.Parent.TabooCommandHandler)
+local GameCommandHandler = require(script.Parent.GameCommandHandler)
 
 -- Simplified NPC detection
 local function findNearestNPC()

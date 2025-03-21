@@ -4,21 +4,23 @@ local Players = game:GetService("Players")
 
 print("SERVER: NPCChatServer script starting")
 
--- Command prefixes to ignore
-local COMMAND_PREFIXES = {
+-- Command prefixes to ignore (all game commands)
+local GAME_COMMANDS = {
 	"/taboo",
-	"/tabooreset",
-	"/taboohelp"
+	"/akinator",
+	"/bluffing",
+	"/exit"
 }
 
 -- Variables
 local ChatEvent
 local loaderNPC
 
--- Function to check if a message is a command
-local function isCommand(message)
-	for _, prefix in ipairs(COMMAND_PREFIXES) do
+-- Function to check if a message is a game command
+local function isGameCommand(message)
+	for _, prefix in ipairs(GAME_COMMANDS) do
 		if message:lower():sub(1, #prefix) == prefix:lower() then
+			print("SERVER: Game command detected:", message)
 			return true
 		end
 	end
@@ -30,16 +32,13 @@ local function getChatEvent()
 	local chatEvent = ReplicatedStorage:FindFirstChild("ChatEvent")
 
 	if not chatEvent then
-		-- If it doesn't exist, create it
 		chatEvent = Instance.new("RemoteEvent")
 		chatEvent.Name = "ChatEvent"
 		chatEvent.Parent = ReplicatedStorage
 		print("SERVER: Created new ChatEvent RemoteEvent in ReplicatedStorage")
 	elseif not chatEvent:IsA("RemoteEvent") then
-		-- If it exists but is not a RemoteEvent (e.g., it's a ModuleScript from Rojo), replace it
 		print("SERVER: Warning: Found ChatEvent but it's a " .. chatEvent.ClassName .. ", replacing with RemoteEvent")
 		chatEvent:Destroy()
-
 		chatEvent = Instance.new("RemoteEvent")
 		chatEvent.Name = "ChatEvent"
 		chatEvent.Parent = ReplicatedStorage
@@ -63,9 +62,8 @@ local function addProximityPrompt(npc)
 
 	prompt.Triggered:Connect(function(player)
 		print("SERVER: Proximity prompt triggered by:", player.Name)
-		ChatEvent:FireClient(player, npc, "Welcome to the game! I'm " .. npc.Name .. ".")
+		ChatEvent:FireClient(player, npc, "Welcome to the game! I'm " .. npc.Name .. ". You can play games with me using these commands:\n/taboo - Play a word guessing game\n/akinator - I'll try to guess what you're thinking\n/bluffing - Play a bluffing game\n/exit - Exit any active game")
 		prompt.Enabled = false	
-
 	end)
 end
 
@@ -106,9 +104,8 @@ local function connectPlayerChatted(player)
 	player.Chatted:Connect(function(message)
 		print("SERVER: Received message from", player.Name, ":", message)
 		
-		-- Ignore command messages
-		if isCommand(message) then
-			print("SERVER: Ignoring command message:", message)
+		-- Let game commands pass through without NPC response
+		if isGameCommand(message) then
 			return
 		end
 		
@@ -176,7 +173,7 @@ Players.PlayerAdded:Connect(function(player)
 
 	-- If the player joins after the script has already run
 	if loaderNPC then
-		ChatEvent:FireClient(player, loaderNPC, "Welcome to the game! I'm " .. loaderNPC.Name .. ".")
+		ChatEvent:FireClient(player, loaderNPC, "Welcome to the game! I'm " .. loaderNPC.Name .. ". Try these commands:\n/taboo - Play a word guessing game\n/akinator - I'll try to guess what you're thinking\n/bluffing - Play a bluffing game\n/exit - Exit any active game")
 	end
 end)
 
