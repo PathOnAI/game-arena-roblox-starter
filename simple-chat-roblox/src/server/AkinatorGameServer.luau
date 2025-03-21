@@ -47,9 +47,9 @@ local function handleStartGame()
     end
 end
 
--- Handle answer requests
-local function handleAnswer(sessionId, answer)
-    print("SERVER: Attempting to send answer to Akinator game. Session:", sessionId, "Answer:", answer)
+-- Handle ask question requests
+local function handleAskQuestion(sessionId, question)
+    print("SERVER: Attempting to send question to Akinator game. Session:", sessionId, "Question:", question)
     
     -- Validate parameters
     if type(sessionId) ~= "string" then
@@ -58,18 +58,18 @@ local function handleAnswer(sessionId, answer)
         }
     end
     
-    if type(answer) ~= "string" then
+    if type(question) ~= "string" then
         return {
-            error = "Invalid answer format"
+            error = "Invalid question format"
         }
     end
     
     local success, response = pcall(function()
         local data = HttpService:JSONEncode({
-            user_response = answer
+            user_response = question
         })
         local result = HttpService:PostAsync(
-            API_BASE_URL .. "/answer?session_id=" .. sessionId,
+            API_BASE_URL .. "/ask_question?session_id=" .. sessionId,
             data
         )
         print("SERVER: Raw API response:", result)
@@ -77,10 +77,10 @@ local function handleAnswer(sessionId, answer)
     end)
 
     if success then
-        print("SERVER: Answer processed successfully:", HttpService:JSONEncode(response))
+        print("SERVER: Question processed successfully:", HttpService:JSONEncode(response))
         return response
     else
-        print("SERVER: Error processing answer:", response)
+        print("SERVER: Error processing question:", response)
         return {
             error = handleHttpError(response)
         }
@@ -89,9 +89,9 @@ end
 
 -- Connect RemoteFunction handlers
 StartGameEvent.OnServerInvoke = handleStartGame
--- Swap parameters for AskQuestionEvent handler
-AskQuestionEvent.OnServerInvoke = function(player, answer, sessionId)
-    return handleAnswer(sessionId, answer)
+-- Fixed parameter order for AskQuestionEvent handler to match TabooGameServer
+AskQuestionEvent.OnServerInvoke = function(player, question, sessionId)
+    return handleAskQuestion(sessionId, question)
 end
 
 print("SERVER: AkinatorGameServer initialization complete")

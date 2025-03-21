@@ -38,8 +38,8 @@ local function startGame()
     end
 end
 
--- Function to make a move in the bluffing game
-local function makeMove(move)
+-- Function to ask question (renamed from makeMove to match Taboo pattern)
+local function askQuestion(move)
     print("BluffingGameClient: Attempting to make move:", move)
     print("BluffingGameClient: Current session state:", game:GetService("HttpService"):JSONEncode(currentSession))
 
@@ -98,7 +98,8 @@ print("BluffingGameClient: Module initialization complete")
 -- Export the module
 return {
     startGame = startGame,
-    makeMove = makeMove,
+    askQuestion = askQuestion,     -- Renamed from makeMove
+    makeMove = askQuestion,        -- Keep for backward compatibility
     isGameActive = isGameActive,
     resetGame = resetGame
 }

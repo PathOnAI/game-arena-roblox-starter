@@ -38,8 +38,8 @@ local function startGame()
     end
 end
 
--- Function to answer a question
-local function answerQuestion(answer)
+-- Function to ask a question (renamed from answerQuestion to match Taboo pattern)
+local function askQuestion(answer)
     print("AkinatorGameClient: Attempting to send answer:", answer)
     print("AkinatorGameClient: Current session state:", game:GetService("HttpService"):JSONEncode(currentSession))
 
@@ -98,7 +98,8 @@ print("AkinatorGameClient: Module initialization complete")
 -- Export the module
 return {
     startGame = startGame,
-    answerQuestion = answerQuestion,
+    askQuestion = askQuestion,         -- Renamed from answerQuestion
+    answerQuestion = askQuestion,      -- Keep for backward compatibility
     isGameActive = isGameActive,
     resetGame = resetGame
 }
