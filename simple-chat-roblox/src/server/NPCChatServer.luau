@@ -4,9 +4,26 @@ local Players = game:GetService("Players")
 
 print("SERVER: NPCChatServer script starting")
 
+-- Command prefixes to ignore
+local COMMAND_PREFIXES = {
+	"/taboo",
+	"/tabooreset",
+	"/taboohelp"
+}
+
 -- Variables
 local ChatEvent
 local loaderNPC
+
+-- Function to check if a message is a command
+local function isCommand(message)
+	for _, prefix in ipairs(COMMAND_PREFIXES) do
+		if message:lower():sub(1, #prefix) == prefix:lower() then
+			return true
+		end
+	end
+	return false
+end
 
 -- Create or get the ChatEvent RemoteEvent
 local function getChatEvent()
@@ -88,6 +105,13 @@ end
 local function connectPlayerChatted(player)
 	player.Chatted:Connect(function(message)
 		print("SERVER: Received message from", player.Name, ":", message)
+		
+		-- Ignore command messages
+		if isCommand(message) then
+			print("SERVER: Ignoring command message:", message)
+			return
+		end
+		
 		local npcName = loaderNPC.Name
 		local response = "Hello, " .. player.Name .. "! I'm " .. npcName .. ". You said: " .. message
 
