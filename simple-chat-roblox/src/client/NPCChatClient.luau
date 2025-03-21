@@ -4,9 +4,7 @@ local UserInputService = game:GetService("UserInputService")
 local ContextActionService = game:GetService("ContextActionService")
 
 local player = Players.LocalPlayer
-
 local TextChatService = game:GetService("TextChatService")
-local Players = game:GetService("Players")
 
 print("CLIENT: NPCChatClient starting initialization")
 
@@ -38,6 +36,10 @@ local isInChat = false
 -- Add at the top level
 local CHAT_COOLDOWN = 1 -- 1 second cooldown between messages
 local lastChatTime = 0
+
+-- Load TabooGame module
+local TabooGame = require(script.Parent.TabooGameClient)
+local TabooCommandHandler = require(script.Parent.TabooCommandHandler)
 
 -- Simplified NPC detection
 local function findNearestNPC()
@@ -126,7 +128,14 @@ local function displayStandardMsg(npcChar, msg)
     openTextChat()
 end
 
+-- Modified chat event handler to check for Taboo game commands
 ChatEvent.OnClientEvent:Connect(function(npcChar, msg)
+    -- First check if Taboo game is active
+    if TabooGame.isGameActive() then
+        print("CLIENT: Ignoring NPC chat - Taboo game is active")
+        return
+    end
+    
     print("CLIENT: Received chat event from server")
     print("CLIENT: NPC:", npcChar and npcChar.name or "nil")
     print("CLIENT: Message:", msg or "nil")
@@ -146,7 +155,8 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     
     print("CLIENT: Input detected:", input.KeyCode.Name)
     
-    if input.KeyCode == Enum.KeyCode.E then
+    -- Only handle E key press for NPC chat if not in Taboo game
+    if input.KeyCode == Enum.KeyCode.E and not TabooGame.isGameActive() then
         -- Check cooldown
         local currentTime = tick()
         if currentTime - lastChatTime < CHAT_COOLDOWN then

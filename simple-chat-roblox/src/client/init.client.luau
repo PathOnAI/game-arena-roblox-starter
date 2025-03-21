@@ -29,8 +29,10 @@ local function safeRequire(moduleName)
     end
 end
 
--- Require the main client script
+-- Require the main client scripts
 safeRequire("NPCChatClient")
+safeRequire("TabooGameClient")
+safeRequire("TabooCommandHandler")
 
 -- Also load the test script if it exists
 -- safeRequire("TestChatScript")
