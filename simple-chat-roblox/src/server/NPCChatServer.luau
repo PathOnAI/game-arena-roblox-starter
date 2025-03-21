@@ -166,4 +166,27 @@ print("SERVER: NPCChatServer fully initialized")
 -- Optional: Uncomment to test the message system on start
 -- testMessageSystem()
 
+ChatEvent.OnServerEvent:Connect(function(player, npc)
+	print("SERVER: Received chat event from player:", player.Name)
+	print("SERVER: NPC received:", npc and npc:GetFullName() or "nil")
+	
+	-- Basic validation
+	if not npc then
+		print("SERVER: No NPC provided")
+		return
+	end
+	
+	if not npc:IsA("Model") then
+		print("SERVER: NPC is not a Model, it's a", npc.ClassName)
+		return
+	end
+	
+	print("SERVER: Sending response back to player")
+	-- Send a response back to the player
+	ChatEvent:FireClient(player, {
+		name = npc.Name,
+	}, "Hello! How can I help you today?")
+	print("SERVER: Response sent to player")
+end)
+
 return true
