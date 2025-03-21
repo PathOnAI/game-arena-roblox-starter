@@ -48,7 +48,6 @@ local function askQuestion(question)
         return false, "No active game session. Start a new game first!"
     end
 
-    -- Pass question first, then session ID
     local response = AskQuestionEvent:InvokeServer(question, currentSession.id)
     print("TabooGameClient: Received response:", response)
     
@@ -62,7 +61,19 @@ local function askQuestion(question)
     if response.game_over then
         print("TabooGameClient: Game over detected")
         currentSession.isGameActive = false
-        return true, response.ai_message .. "\n\nGame Over! " .. (response.game_status or "")
+        
+        -- Get the ChatEvent
+        local ChatEvent = ReplicatedStorage:FindFirstChild("ChatEvent")
+        if ChatEvent then
+            -- Send game result to NPC
+            if response.game_status == "PLAYER_WIN" then
+                ChatEvent:FireServer("GAME_WIN")
+            elseif response.game_status == "PLAYER_LOSE" then
+                ChatEvent:FireServer("GAME_LOSE")
+            end
+        end
+        
+        return true, response.ai_message .. "\n\nGame Over!"
     end
     
     return true, response.ai_message .. "\n\nRound " .. currentSession.round .. "/5"

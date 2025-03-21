@@ -190,25 +190,53 @@ print("SERVER: NPCChatServer fully initialized")
 -- Optional: Uncomment to test the message system on start
 -- testMessageSystem()
 
-ChatEvent.OnServerEvent:Connect(function(player, npc)
+ChatEvent.OnServerEvent:Connect(function(player, input)
 	print("SERVER: Received chat event from player:", player.Name)
-	print("SERVER: NPC received:", npc and npc:GetFullName() or "nil")
+	print("SERVER: Input received:", input)
 	
-	-- Basic validation
-	if not npc then
+	if input == "GAME_WIN" then
+		-- Make NPC jump
+		if loaderNPC then
+			local humanoid = loaderNPC:FindFirstChild("Humanoid")
+			if humanoid then
+				humanoid.Jump = true
+				ChatEvent:FireClient(player, {name = loaderNPC.Name}, "Congratulations! You won!")
+			end
+		end
+		return
+	elseif input == "GAME_LOSE" then
+		-- Make NPC walk backwards
+		if loaderNPC then
+			local humanoid = loaderNPC:FindFirstChild("Humanoid")
+			local hrp = loaderNPC:FindFirstChild("HumanoidRootPart")
+			if humanoid and hrp then
+				local playerChar = player.Character
+				if playerChar and playerChar:FindFirstChild("HumanoidRootPart") then
+					local direction = (hrp.Position - playerChar.HumanoidRootPart.Position).Unit
+					local targetPos = hrp.Position + direction * 15
+					humanoid:MoveTo(targetPos)
+					ChatEvent:FireClient(player, {name = loaderNPC.Name}, "Oh, you lost! Better luck next time!")
+				end
+			end
+		end
+		return
+	end
+	
+	-- Handle regular NPC chat
+	if not input then
 		print("SERVER: No NPC provided")
 		return
 	end
 	
-	if not npc:IsA("Model") then
-		print("SERVER: NPC is not a Model, it's a", npc.ClassName)
+	if not input:IsA("Model") then
+		print("SERVER: NPC is not a Model, it's a", input.ClassName)
 		return
 	end
 	
 	print("SERVER: Sending response back to player")
 	-- Send a response back to the player
 	ChatEvent:FireClient(player, {
-		name = npc.Name,
+		name = input.Name,
 	}, "Hello! How can I help you today?")
 	print("SERVER: Response sent to player")
 end)
