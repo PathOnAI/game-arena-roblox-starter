@@ -4,7 +4,7 @@ on:
   push:
     branches: [ "main" ] 
     paths:
-      - 'fargate-backend/**' 
+      - 'backend/**' 
   workflow_dispatch:
 
 env:
@@ -47,7 +47,7 @@ jobs:
         # Build a docker container for ARM64 and push it to ECR
         docker buildx build --platform linux/arm64 \
           --tag $ECR_REGISTRY/$ECR_REPOSITORY:latest \
-          --push ./fargate-backend
+          --push ./backend
 
     - name: Force new deployment of ECS service
       run: |
