@@ -4,25 +4,65 @@ local Players = game:GetService("Players")
 
 print("SERVER: NPCChatServer script starting")
 
--- Command prefixes to ignore
-local COMMAND_PREFIXES = {
+-- Command prefixes to ignore (all game commands)
+local GAME_COMMANDS = {
 	"/taboo",
-	"/tabooreset",
-	"/taboohelp"
+	"/akinator",
+	"/bluffing",
+	"/exit"
 }
 
 -- Variables
 local ChatEvent
 local loaderNPC
 
--- Function to check if a message is a command
-local function isCommand(message)
-	for _, prefix in ipairs(COMMAND_PREFIXES) do
+-- Function to check if a message is a game command
+local function isGameCommand(message)
+	for _, prefix in ipairs(GAME_COMMANDS) do
 		if message:lower():sub(1, #prefix) == prefix:lower() then
+			print("SERVER: Game command detected:", message)
 			return true
 		end
 	end
 	return false
+end
+
+-- Process game commands directly
+local function processGameCommand(player, message)
+    local command = message:lower()
+    
+    -- Check which game to start
+    if command:sub(1, 7) == "/taboo " then
+        print("SERVER: Processing Taboo command")
+        -- We don't need to do anything here as client will handle it
+        return true
+    elseif command:sub(1, 10) == "/akinator " then
+        print("SERVER: Processing Akinator command")
+        -- We don't need to do anything here as client will handle it
+        return true
+    elseif command:sub(1, 10) == "/bluffing " then
+        print("SERVER: Processing Bluffing command")
+        -- We don't need to do anything here as client will handle it
+        return true
+    elseif command == "/taboo" then
+        print("SERVER: Starting Taboo game")
+        -- We don't need to do anything here as client will handle it
+        return true
+    elseif command == "/akinator" then
+        print("SERVER: Starting Akinator game")
+        -- We don't need to do anything here as client will handle it
+        return true
+    elseif command == "/bluffing" then
+        print("SERVER: Starting Bluffing game")
+        -- We don't need to do anything here as client will handle it
+        return true
+    elseif command == "/exit" then
+        print("SERVER: Exiting active game")
+        -- We don't need to do anything here as client will handle it
+        return true
+    end
+    
+    return false
 end
 
 -- Create or get the ChatEvent RemoteEvent
@@ -30,16 +70,13 @@ local function getChatEvent()
 	local chatEvent = ReplicatedStorage:FindFirstChild("ChatEvent")
 
 	if not chatEvent then
-		-- If it doesn't exist, create it
 		chatEvent = Instance.new("RemoteEvent")
 		chatEvent.Name = "ChatEvent"
 		chatEvent.Parent = ReplicatedStorage
 		print("SERVER: Created new ChatEvent RemoteEvent in ReplicatedStorage")
 	elseif not chatEvent:IsA("RemoteEvent") then
-		-- If it exists but is not a RemoteEvent (e.g., it's a ModuleScript from Rojo), replace it
 		print("SERVER: Warning: Found ChatEvent but it's a " .. chatEvent.ClassName .. ", replacing with RemoteEvent")
 		chatEvent:Destroy()
-
 		chatEvent = Instance.new("RemoteEvent")
 		chatEvent.Name = "ChatEvent"
 		chatEvent.Parent = ReplicatedStorage
@@ -63,9 +100,8 @@ local function addProximityPrompt(npc)
 
 	prompt.Triggered:Connect(function(player)
 		print("SERVER: Proximity prompt triggered by:", player.Name)
-		ChatEvent:FireClient(player, npc, "Welcome to the game! I'm " .. npc.Name .. ".")
+		ChatEvent:FireClient(player, npc, "Welcome to the game! I'm " .. npc.Name .. ". You can play games with me using these commands:\n/taboo - Play a word guessing game\n/akinator - I'll try to guess what you're thinking\n/bluffing - Play a bluffing game\n/exit - Exit any active game")
 		prompt.Enabled = false	
-
 	end)
 end
 
@@ -106,9 +142,9 @@ local function connectPlayerChatted(player)
 	player.Chatted:Connect(function(message)
 		print("SERVER: Received message from", player.Name, ":", message)
 		
-		-- Ignore command messages
-		if isCommand(message) then
-			print("SERVER: Ignoring command message:", message)
+		-- Let game commands pass through without NPC response
+		if isGameCommand(message) then
+            processGameCommand(player, message)
 			return
 		end
 		
@@ -147,8 +183,44 @@ local function testMessageSystem()
 	end
 end
 
+-- Function to verify that all game remotes exist
+local function verifyGameRemotes()
+    -- Check Taboo remotes
+    local tabooRemotes = ReplicatedStorage:FindFirstChild("TabooRemotes")
+    if not tabooRemotes or
+       not tabooRemotes:FindFirstChild("TabooStartGame") or
+       not tabooRemotes:FindFirstChild("TabooAskQuestion") then
+        warn("SERVER: TabooRemotes are missing or incomplete!")
+    else
+        print("SERVER: TabooRemotes verified")
+    end
+    
+    -- Check Akinator remotes
+    local akinatorRemotes = ReplicatedStorage:FindFirstChild("AkinatorRemotes")
+    if not akinatorRemotes or
+       not akinatorRemotes:FindFirstChild("AkinatorStartGame") or
+       not akinatorRemotes:FindFirstChild("AkinatorAskQuestion") then
+        warn("SERVER: AkinatorRemotes are missing or incomplete!")
+    else
+        print("SERVER: AkinatorRemotes verified")
+    end
+    
+    -- Check Bluffing remotes
+    local bluffingRemotes = ReplicatedStorage:FindFirstChild("BluffingRemotes")
+    if not bluffingRemotes or
+       not bluffingRemotes:FindFirstChild("BluffingStartGame") or
+       not bluffingRemotes:FindFirstChild("BluffingMakeMove") then
+        warn("SERVER: BluffingRemotes are missing or incomplete!")
+    else
+        print("SERVER: BluffingRemotes verified")
+    end
+end
+
 -- INITIALIZATION
 ChatEvent = getChatEvent()
+
+-- Verify all game remotes exist
+verifyGameRemotes()
 
 -- Find the loader NPC
 local maxAttempts = 10
@@ -176,7 +248,7 @@ Players.PlayerAdded:Connect(function(player)
 
 	-- If the player joins after the script has already run
 	if loaderNPC then
-		ChatEvent:FireClient(player, loaderNPC, "Welcome to the game! I'm " .. loaderNPC.Name .. ".")
+		ChatEvent:FireClient(player, loaderNPC, "Welcome to the game! I'm " .. loaderNPC.Name .. ". Try these commands:\n/taboo - Play a word guessing game\n/akinator - I'll try to guess what you're thinking\n/bluffing - Play a bluffing game\n/exit - Exit any active game")
 	end
 end)
 

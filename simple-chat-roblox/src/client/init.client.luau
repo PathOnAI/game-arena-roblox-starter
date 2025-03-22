@@ -32,7 +32,9 @@ end
 -- Require the main client scripts
 safeRequire("NPCChatClient")
 safeRequire("TabooGameClient")
-safeRequire("TabooCommandHandler")
+safeRequire("AkinatorGameClient")
+safeRequire("BluffingGameClient")
+safeRequire("GameCommandHandler")
 
 -- Also load the test script if it exists
 -- safeRequire("TestChatScript")

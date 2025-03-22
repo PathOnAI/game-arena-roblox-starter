@@ -37,9 +37,16 @@ local isInChat = false
 local CHAT_COOLDOWN = 1 -- 1 second cooldown between messages
 local lastChatTime = 0
 
--- Load TabooGame module
+-- Load all game modules
 local TabooGame = require(script.Parent.TabooGameClient)
-local TabooCommandHandler = require(script.Parent.TabooCommandHandler)
+local AkinatorGame = require(script.Parent.AkinatorGameClient)
+local BluffingGame = require(script.Parent.BluffingGameClient)
+local GameCommandHandler = require(script.Parent.GameCommandHandler)
+
+-- Function to check if any game is active
+local function isAnyGameActive()
+    return TabooGame.isGameActive() or AkinatorGame.isGameActive() or BluffingGame.isGameActive()
+end
 
 -- Simplified NPC detection
 local function findNearestNPC()
@@ -128,11 +135,11 @@ local function displayStandardMsg(npcChar, msg)
     openTextChat()
 end
 
--- Modified chat event handler to check for Taboo game commands
+-- Modified chat event handler to check for ALL game modes
 ChatEvent.OnClientEvent:Connect(function(npcChar, msg)
-    -- First check if Taboo game is active
-    if TabooGame.isGameActive() then
-        print("CLIENT: Ignoring NPC chat - Taboo game is active")
+    -- Check if ANY game is active
+    if isAnyGameActive() then
+        print("CLIENT: Ignoring NPC chat - Game is active")
         return
     end
     
@@ -155,8 +162,8 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     
     print("CLIENT: Input detected:", input.KeyCode.Name)
     
-    -- Only handle E key press for NPC chat if not in Taboo game
-    if input.KeyCode == Enum.KeyCode.E and not TabooGame.isGameActive() then
+    -- Only handle E key press for NPC chat if no game is active
+    if input.KeyCode == Enum.KeyCode.E and not isAnyGameActive() then
         -- Check cooldown
         local currentTime = tick()
         if currentTime - lastChatTime < CHAT_COOLDOWN then
