@@ -1,8 +1,13 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 local Players = game:GetService("Players")
+local HttpService = game:GetService("HttpService")
 
 print("SERVER: NPCChatServer script starting")
+
+-- API configuration
+local API_BASE_URL = "http://ai-space-escape-api.pathon.ai"
+local sessionCache = {} -- Store session IDs for each player
 
 -- Command prefixes to ignore (all game commands)
 local GAME_COMMANDS = {
@@ -58,11 +63,91 @@ local function processGameCommand(player, message)
         return true
     elseif command == "/exit" then
         print("SERVER: Exiting active game")
-        -- We don't need to do anything here as client will handle it
+        -- Reset the chat session
+        sessionCache[player.UserId] = nil
+        print("SERVER: Reset chat session for player", player.Name, "after /exit command")
+        -- We don't need to do anything else here as client will handle game exit
         return true
     end
     
     return false
+end
+
+-- Start a chat session with the API
+local function startChatSession(player, forceNewSession)
+    -- If forceNewSession is true or no session exists, create a new one
+    if forceNewSession or not sessionCache[player.UserId] then
+        local success, response = pcall(function()
+            return HttpService:PostAsync(
+                API_BASE_URL.."/chat/start",
+                "",
+                Enum.HttpContentType.ApplicationJson
+            )
+        end)
+        
+        if success then
+            local responseData = HttpService:JSONDecode(response)
+            if responseData and responseData.session_id then
+                sessionCache[player.UserId] = responseData.session_id
+                print("SERVER: Created chat session for player", player.Name, "with ID:", responseData.session_id)
+                return responseData.session_id
+            else
+                warn("SERVER: Failed to parse session ID from response:", response)
+            end
+        else
+            warn("SERVER: Failed to start chat session:", response)
+        end
+        
+        return nil
+    end
+    
+    -- Return existing session
+    return sessionCache[player.UserId]
+end
+
+-- Send message to the AI chat API
+local function sendMessageToAPI(player, message, forceNewSession)
+    local sessionId = nil
+    
+    -- If this is the first message or forceNewSession is true, create a new session
+    if forceNewSession then
+        sessionId = startChatSession(player, true)
+    else
+        sessionId = sessionCache[player.UserId]
+        -- If no session exists, create one
+        if not sessionId then
+            sessionId = startChatSession(player)
+        end
+    end
+    
+    if not sessionId then
+        return "Sorry, I'm having trouble connecting to my AI brain right now."
+    end
+    
+    -- Send the message to the API
+    local success, response = pcall(function()
+        return HttpService:PostAsync(
+            API_BASE_URL.."/chat/ask_question?session_id="..sessionId,
+            HttpService:JSONEncode({
+                user_response = message
+            }),
+            Enum.HttpContentType.ApplicationJson
+        )
+    end)
+    
+    if success then
+        local responseData = HttpService:JSONDecode(response)
+        if responseData and responseData.message then
+            return responseData.message
+        else
+            -- For debugging purposes
+            print("SERVER: Received API response but no message field:", response)
+            return "I received your message, but I'm not sure how to respond right now."
+        end
+    else
+        warn("SERVER: Failed to get response from API:", response)
+        return "Sorry, I'm having trouble connecting to my AI brain right now."
+    end
 end
 
 -- Create or get the ChatEvent RemoteEvent
@@ -100,7 +185,12 @@ local function addProximityPrompt(npc)
 
 	prompt.Triggered:Connect(function(player)
 		print("SERVER: Proximity prompt triggered by:", player.Name)
-		ChatEvent:FireClient(player, npc, "Welcome to the game! I'm " .. npc.Name .. ". You can play games with me using these commands:\n/taboo - Play a word guessing game\n/akinator - I'll try to guess what you're thinking\n/bluffing - Play a bluffing game\n/exit - Exit any active game")
+        
+        -- Always create a new session when initiating conversation via proximity prompt
+        startChatSession(player, true)
+        
+        local welcomeMessage = "Welcome to the game! I'm " .. npc.Name .. ". You can play games with me using these commands:\n/taboo - Play a word guessing game\n/akinator - I'll try to guess what you're thinking\n/bluffing - Play a bluffing game\n/exit - Exit any active game"
+		ChatEvent:FireClient(player, npc, welcomeMessage)
 		prompt.Enabled = false	
 	end)
 end
@@ -149,8 +239,7 @@ local function connectPlayerChatted(player)
 		end
 		
 		local npcName = loaderNPC.Name
-		local response = "Hello, " .. player.Name .. "! I'm " .. npcName .. ". You said: " .. message
-
+		
 		-- If we found the NPC, make it look at the player
 		local humanoid = loaderNPC:FindFirstChild("Humanoid")
 		local hrp = loaderNPC:FindFirstChild("HumanoidRootPart")
@@ -165,6 +254,13 @@ local function connectPlayerChatted(player)
 				-- Make the NPC face the player when talking
 				humanoid:MoveTo(hrp.Position) -- Stop any movement
 				hrp.CFrame = CFrame.new(hrp.Position, Vector3.new(playerHRP.Position.X, hrp.Position.Y, playerHRP.Position.Z))
+				
+                -- Check if this is the first message from the player
+                local isFirstMessage = not sessionCache[player.UserId]
+                
+                -- Get AI response from API
+                local response = sendMessageToAPI(player, message, isFirstMessage)
+                
 				print("SERVER: Sending response to", player.Name, ":", response)
 				ChatEvent:FireClient(player, loaderNPC, response)
 				print("SERVER: Made NPC face player")
@@ -248,13 +344,26 @@ Players.PlayerAdded:Connect(function(player)
 
 	-- If the player joins after the script has already run
 	if loaderNPC then
+        -- Start a chat session for the player
+        startChatSession(player, true)
+        
 		ChatEvent:FireClient(player, loaderNPC, "Welcome to the game! I'm " .. loaderNPC.Name .. ". Try these commands:\n/taboo - Play a word guessing game\n/akinator - I'll try to guess what you're thinking\n/bluffing - Play a bluffing game\n/exit - Exit any active game")
 	end
+end)
+
+-- Handle when players leave to clear the session cache
+Players.PlayerRemoving:Connect(function(player)
+    if sessionCache[player.UserId] then
+        sessionCache[player.UserId] = nil
+        print("SERVER: Removed chat session for player", player.Name)
+    end
 end)
 
 -- Handle existing players
 for _, player in ipairs(Players:GetPlayers()) do
 	connectPlayerChatted(player)
+    -- Create chat sessions for existing players
+    startChatSession(player, true)
 end
 
 print("SERVER: NPCChatServer fully initialized")
@@ -306,10 +415,17 @@ ChatEvent.OnServerEvent:Connect(function(player, input)
 	end
 	
 	print("SERVER: Sending response back to player")
+    
+    -- Check if this is first interaction with NPC
+    local isFirstNPCInteraction = not sessionCache[player.UserId]
+    
+    -- Get AI response via the API, creating a new session for first interaction
+    local response = sendMessageToAPI(player, "Hello", isFirstNPCInteraction)
+    
 	-- Send a response back to the player
 	ChatEvent:FireClient(player, {
 		name = input.Name,
-	}, "Hello! How can I help you today?")
+	}, response)
 	print("SERVER: Response sent to player")
 end)
 
