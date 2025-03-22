@@ -58,6 +58,16 @@ def show_tables_sqlalchemy():
             for column in columns:
                 print(f"  - {column['name']}: {column['type']}")
             
+            # Show foreign keys for each table
+            foreign_keys = inspector.get_foreign_keys(table_name)
+            if foreign_keys:
+                print(f"Foreign keys ({len(foreign_keys)}):")
+                for fk in foreign_keys:
+                    print(f"  - {', '.join(fk['constrained_columns'])} -> "
+                          f"{fk['referred_table']}.{', '.join(fk['referred_columns'])}")
+                    if fk.get('options', {}).get('ondelete'):
+                        print(f"    ON DELETE: {fk['options']['ondelete']}")
+            
             # Get row count
             result = connection.execute(text(f"SELECT COUNT(*) FROM {table_name}"))
             row_count = result.scalar()

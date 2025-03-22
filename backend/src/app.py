@@ -12,6 +12,7 @@ from src.npc.npc_page import router as npc_router  # Include the NPC router
 from src.users.user import router as user_router
 from src.action.action_page import router as action_router
 from src.games.base_page import router as base_router
+from src.chat.chat_routes import router as chat_router
 
 app = FastAPI(title="Game Arena", debug=True)
 
@@ -24,6 +25,7 @@ app.include_router(story_scenario_router, prefix="/scenario")
 app.include_router(npc_router, prefix="")  # No prefix, or you can set '/npc'
 app.include_router(user_router, prefix="")
 app.include_router(base_router, prefix="")
+app.include_router(chat_router, prefix="/chat")
 
 @app.get("/")
 def main():
