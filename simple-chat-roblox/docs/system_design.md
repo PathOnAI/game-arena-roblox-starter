@@ -3,6 +3,10 @@
 ## Project Overview
 A Roblox game featuring multiple AI-powered games (Taboo, Akinator, and Bluffing) with NPC interaction. The project uses Rojo for file management and version control.
 
+## System Architecture Diagram
+
+![System Architecture](system_design.png)
+
 ## Directory Structure
 
 ### Server-Side (`src/server/`)
